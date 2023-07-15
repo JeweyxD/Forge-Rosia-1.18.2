@@ -60,6 +60,11 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<CharcoalKilnBlockEntity>> CHARCOAL_KILN_BLOCK_ENTITY =
             register("charcoal_kiln_block_entity", CharcoalKilnBlockEntity::new, ModBlocks.CHARCOAL_KILN);
 
+    public static final RegistryObject<BlockEntityType<CanningPressBlockEntity>> CANNING_PRESS_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("canning_press_block_entity", () ->
+                    BlockEntityType.Builder.of(CanningPressBlockEntity::new,
+                            ModBlocks.CANNING_PRESS.get()).build(null));
+
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

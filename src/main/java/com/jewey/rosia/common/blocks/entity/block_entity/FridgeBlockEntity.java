@@ -9,6 +9,8 @@ import com.jewey.rosia.common.container.FridgeContainer;
 import com.jewey.rosia.networking.ModMessages;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
 import com.jewey.rosia.util.ModEnergyStorage;
+import com.jewey.rosia.util.RosiaTags;
+import net.dries007.tfc.common.blockentities.TickableInventoryBlockEntity;
 import net.dries007.tfc.common.capabilities.DelegateItemHandler;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
@@ -275,6 +277,7 @@ public class FridgeBlockEntity extends MultiblockBlockEntity implements MenuProv
     public boolean isItemValid(int slot, ItemStack stack)
     {
         return ItemSizeManager.get(stack).getSize(stack).isSmallerThan(Size.LARGE)
-                && Helpers.mightHaveCapability(stack, FoodCapability.CAPABILITY) && super.isItemValid(slot, stack);
+                && Helpers.mightHaveCapability(stack, FoodCapability.CAPABILITY)
+                && !stack.is(RosiaTags.Items.DYNAMIC_CAN) && super.isItemValid(slot, stack);
     }
 }

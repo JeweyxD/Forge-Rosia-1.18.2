@@ -3,8 +3,11 @@ package com.jewey.rosia.common.items;
 import com.jewey.rosia.Rosia;
 import com.jewey.rosia.common.blocks.ModBlocks;
 import net.dries007.tfc.common.TFCTags;
+import net.dries007.tfc.common.capabilities.food.Nutrient;
 import net.dries007.tfc.common.items.*;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -12,6 +15,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -154,6 +158,19 @@ public class ModItems {
             () -> new ArmorItem(ModArmorMaterials.PURPLE_STEEL, EquipmentSlot.FEET, properties()));
 
 
+    // CANNED FOOD
+    public static final Map<Nutrient, RegistryObject<DynamicCanFood>> CANS = Helpers.mapOfKeys(Nutrient.class, nutrient ->
+            register("food/" + nutrient.name() + "_can",
+                    () -> new DynamicCanFood(new Item.Properties().food(new FoodProperties.Builder()
+                            .nutrition(4).saturationMod(0.3f).build()).tab(ModCreativeModeTab.ROSIA_TAB))));
+
+    public static final RegistryObject<DynamicCanFood> SOUP_CAN = register("food/soup_can",
+            () -> new DynamicCanFood(new Item.Properties().food(new FoodProperties.Builder()
+                            .nutrition(4).saturationMod(0.3f).build()).tab(ModCreativeModeTab.ROSIA_TAB)));
+
+    public static final RegistryObject<Item> TIN_CAN = register("tin_can");
+
+
 
     //DOWN HERE SO IT'S NEAR THE BLOCKS
     public static final RegistryObject<StandingAndWallBlockItem> IRON_SUPPORT = register("iron_support",
@@ -167,15 +184,15 @@ public class ModItems {
         return new Item.Properties().tab(ModCreativeModeTab.ROSIA_TAB);
     }
 
-    public static RegistryObject<Item> register(String name) {
+    private static RegistryObject<Item> register(String name) {
         return register(name, ModCreativeModeTab.ROSIA_TAB);
     }
 
-    public static RegistryObject<Item> register(String name, CreativeModeTab group) {
+    private static RegistryObject<Item> register(String name, CreativeModeTab group) {
         return register(name, () -> new Item(new Item.Properties().tab(group)));
     }
 
-    public static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item) {
+    private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item) {
         return ITEMS.register(name.toLowerCase(Locale.ROOT), item);
     }
 

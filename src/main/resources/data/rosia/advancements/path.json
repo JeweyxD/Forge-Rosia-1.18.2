@@ -3,7 +3,7 @@
     "icon": {
       "item": "rosia:andesite_path"
     },
-    "title": "On the road again",
+    "title": "On the Road Again",
     "description": "Move quicker with stone paths",
     "frame": "task",
     "show_toast": true,

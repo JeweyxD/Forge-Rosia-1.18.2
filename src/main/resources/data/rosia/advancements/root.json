@@ -12,7 +12,7 @@
       "translate": "TerraFirmaCraft Rosia"
     },
     "description": {
-      "translate": "Rosia's progression"
+      "translate": "Rosia's progression line"
     },
     "frame": "task",
     "show_toast": true,

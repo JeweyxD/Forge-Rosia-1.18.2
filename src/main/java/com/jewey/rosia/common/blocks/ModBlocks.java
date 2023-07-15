@@ -78,6 +78,10 @@ public class ModBlocks {
                     .pathType(BlockPathTypes.DAMAGE_FIRE).blockEntity(ModBlockEntities.ELECTRIC_FORGE_BLOCK_ENTITY)
                     .serverTicks(ElectricForgeBlockEntity::serverTick)), ModCreativeModeTab.ROSIA_TAB);
 
+    public static final RegistryObject<Block> CANNING_PRESS = registerBlock("canning_press",
+            () -> new canning_press(BlockBehaviour.Properties.of(Material.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)), ModCreativeModeTab.ROSIA_TAB);
+
     public static final Supplier<? extends Block> ELECTRIC_GRILL = register("electric_grill",
             () -> new electric_grill(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
                     .randomTicks().sound(SoundType.METAL).lightLevel((state) -> state.getValue(electric_grill.ON) ? 12 : 0)

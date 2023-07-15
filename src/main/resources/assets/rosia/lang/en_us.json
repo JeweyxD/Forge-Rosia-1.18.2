@@ -70,6 +70,15 @@
 
   "item.rosia.iron_support": "Iron Support",
 
+  "item.rosia.food.dairy_can": "Canned Dairy",
+  "item.rosia.food.fruit_can": "Canned Fruit",
+  "item.rosia.food.grain_can": "Canned Bread",
+  "item.rosia.food.protein_can": "Canned Meat",
+  "item.rosia.food.vegetables_can": "Canned Vegetables",
+  "item.rosia.food.soup_can": "Canned Soup",
+
+  "item.rosia.tin_can": "Tin Can",
+
 
   "block.rosia.andesite_path": "Andesite Path",
   "block.rosia.basalt_path": "Basalt Path",
@@ -107,6 +116,7 @@
   "block.rosia.iron_support_vertical": "Iron Support",
   "block.rosia.iron_support_horizontal": "Iron Support",
   "block.rosia.charcoal_kiln": "Charcoal Kiln",
+  "block.rosia.canning_press": "Canning Press",
 
   "fluid.rosia.invar_fluid": "Invar",
   "metal.rosia.invar": "Invar",
@@ -117,6 +127,7 @@
 
   "tfc.tooltip.food_trait.bound": "Leather Bound",
   "tfc.tooltip.food_trait.refrigerated": "Refrigerated",
+  "tfc.tooltip.food_trait.canned": "Canned",
 
   "effect.rosia.path_speed": "Path Speed",
 

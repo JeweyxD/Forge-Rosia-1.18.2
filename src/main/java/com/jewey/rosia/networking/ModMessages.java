@@ -3,6 +3,7 @@ package com.jewey.rosia.networking;
 import com.jewey.rosia.Rosia;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
 import com.jewey.rosia.networking.packet.FluidSyncS2CPacket;
+import com.jewey.rosia.networking.packet.ItemStackSyncS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -38,6 +39,12 @@ public class ModMessages {
                 .decoder(FluidSyncS2CPacket::new)
                 .encoder(FluidSyncS2CPacket::toBytes)
                 .consumer(FluidSyncS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(ItemStackSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ItemStackSyncS2CPacket::new)
+                .encoder(ItemStackSyncS2CPacket::toBytes)
+                .consumer(ItemStackSyncS2CPacket::handle)
                 .add();
     }
 

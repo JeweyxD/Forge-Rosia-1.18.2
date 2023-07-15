@@ -21,8 +21,9 @@ public class RosiaTags {
         }
     }
     public static class Items {
-        public static final TagKey<Item> FIRE_BOX_FUEL = forgeTag("fire_box_fuel");
-        public static final TagKey<Item> STONE_PATH = forgeTag("stone_path");
+        public static final TagKey<Item> FIRE_BOX_FUEL = tag("fire_box_fuel");
+        public static final TagKey<Item> STONE_PATH = tag("stone_path");
+        public static final TagKey<Item> DYNAMIC_CAN = tag("dynamic_can_item");
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(Rosia.MOD_ID, name));
         }

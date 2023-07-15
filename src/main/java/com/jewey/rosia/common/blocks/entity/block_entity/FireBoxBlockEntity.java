@@ -53,7 +53,7 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         return switch (slot) {
-            case 0, 1, 2 -> Helpers.isItem(stack.getItem(), TFCTags.Items.FORGE_FUEL) || Helpers.isItem(stack.getItem(), TFCTags.Items.LOG_PILE_LOGS);
+            case 0, 1, 2 -> stack.is(RosiaTags.Items.FIRE_BOX_FUEL);
             case 3 -> stack.getItem() == TFCItems.POWDERS.get(Powder.WOOD_ASH).get();
             default -> super.isItemValid(slot, stack);
         };

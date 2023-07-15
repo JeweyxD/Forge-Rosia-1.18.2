@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "You will need to construct the charcoal kiln multi-block. The structure is made from the kiln block and five brick blocks. The center must be hollow.$(br2)The kiln will only be interactable if the structure is complete. Destroying the structure while it is lit will result in losing logs."
+      "text": "You will need to construct the charcoal kiln multi-block. The structure is made from the kiln block and five brick blocks. The center must be hollow.$(br2)The kiln will only be interactable if the structure is complete. Destroying the structure while it is lit will result in losing logs. Once logs are inside the kiln, light with a firestarter."
     },
     {
       "type": "patchouli:multiblock",

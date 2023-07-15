@@ -9,7 +9,7 @@
     "show_toast": true,
     "announce_to_chat": true
   },
-  "parent": "rosia:extruding_machine",
+  "parent": "rosia:electric_grill",
   "criteria": {
     "requirement": {
       "trigger": "minecraft:inventory_changed",

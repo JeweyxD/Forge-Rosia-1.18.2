@@ -123,26 +123,59 @@ public class charcoal_kiln extends DeviceBlock
 
     //MULTIBLOCK
 
-    private static final MultiBlock FORGE_MULTIBLOCK;
+    private static final MultiBlock FORGE_MULTIBLOCK_NORTH; // One for each direction the kiln block is the front
+    private static final MultiBlock FORGE_MULTIBLOCK_SOUTH;
+    private static final MultiBlock FORGE_MULTIBLOCK_EAST;
+    private static final MultiBlock FORGE_MULTIBLOCK_WEST;
 
     static
     {
         BiPredicate<LevelAccessor, BlockPos> isValidSide = (level, pos) -> isForgeInsulationBlock(level.getBlockState(pos));
         BlockPos origin = BlockPos.ZERO;
-        FORGE_MULTIBLOCK = new MultiBlock()
+        FORGE_MULTIBLOCK_NORTH = new MultiBlock()
                 // Center Air
                 .match(origin.relative(Direction.SOUTH), BlockStateBase::isAir)
                 // Around Center
-                .matchEachDirection(origin.relative(Direction.SOUTH, 1), isValidSide, new Direction[] {Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.DOWN, Direction.UP}, 1);
-    }
+                .matchEachDirection(origin.relative(Direction.SOUTH, 1), isValidSide, new Direction[]
+                        {Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.DOWN, Direction.UP}, 1);
+        
+        FORGE_MULTIBLOCK_SOUTH = new MultiBlock()
+                // Center Air
+                .match(origin.relative(Direction.NORTH), BlockStateBase::isAir)
+                // Around Center
+                .matchEachDirection(origin.relative(Direction.NORTH, 1), isValidSide, new Direction[]
+                        {Direction.EAST, Direction.NORTH, Direction.WEST, Direction.DOWN, Direction.UP}, 1);
 
-    public static boolean isValid(LevelAccessor world, BlockPos pos)
-    {
-        return FORGE_MULTIBLOCK.test(world, pos);
-    }
+        FORGE_MULTIBLOCK_EAST = new MultiBlock()
+                // Center Air
+                .match(origin.relative(Direction.WEST), BlockStateBase::isAir)
+                // Around Center
+                .matchEachDirection(origin.relative(Direction.WEST, 1), isValidSide, new Direction[]
+                        {Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.DOWN, Direction.UP}, 1);
 
+        FORGE_MULTIBLOCK_WEST = new MultiBlock()
+                // Center Air
+                .match(origin.relative(Direction.EAST), BlockStateBase::isAir)
+                // Around Center
+                .matchEachDirection(origin.relative(Direction.EAST, 1), isValidSide, new Direction[]
+                        {Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.DOWN, Direction.UP}, 1);
+    }
+    
     public static boolean isForgeInsulationBlock(BlockState state)
     {
         return Helpers.isBlock(state, Block.byItem(Items.BRICKS));
+    }
+    
+    public static boolean isValid(LevelAccessor world, BlockPos pos)
+    {
+        MultiBlock[] multiBlocks = {FORGE_MULTIBLOCK_NORTH, FORGE_MULTIBLOCK_SOUTH, FORGE_MULTIBLOCK_EAST, FORGE_MULTIBLOCK_WEST};
+        boolean valid;
+        for (MultiBlock multiBlock: multiBlocks) {
+            valid = multiBlock.test(world, pos);
+            if (valid) {    // Pull this little maneuver to get around it returning false if previous variables are invalid
+                return true;
+            }
+        }
+        return false;
     }
 }
