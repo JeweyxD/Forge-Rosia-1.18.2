@@ -2,6 +2,8 @@ package com.jewey.rosia.common.blocks.entity.block_entity;
 
 import com.jewey.rosia.common.blocks.custom.fridge;
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
+import com.jewey.rosia.common.blocks.entity.MultiblockBlockEntity;
+import com.jewey.rosia.common.capabilities.MultiblockCapability;
 import com.jewey.rosia.common.capabilities.food.RosiaFoodTraits;
 import com.jewey.rosia.common.container.FridgeContainer;
 import com.jewey.rosia.networking.ModMessages;
@@ -22,14 +24,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -39,15 +40,27 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
 import static com.jewey.rosia.Rosia.MOD_ID;
 
-public class FridgeBlockEntity extends TickableInventoryBlockEntity<ItemStackHandler> implements MenuProvider, DelegateItemHandler, ISlotCallback {
+public class FridgeBlockEntity extends MultiblockBlockEntity implements MenuProvider, DelegateItemHandler, ISlotCallback {
 
     public static final int SLOT_MIN = 0;
     public static final int SLOT_MAX = 8;
+
+    @Override
+    public FridgeBlockEntity master() {
+        if (isDummy) {
+            assert level != null;
+            BlockEntity blockEntity = level.getBlockEntity(getBlockPos().below());
+            return (blockEntity instanceof FridgeBlockEntity fridge) ? fridge : null;
+        } else {
+            return this;
+        }
+    }
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
         @Override
@@ -109,15 +122,6 @@ public class FridgeBlockEntity extends TickableInventoryBlockEntity<ItemStackHan
         }
     }
 
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
-        if(cap == CapabilityEnergy.ENERGY) {
-            return lazyEnergyHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
     private final ModEnergyStorage ENERGY_STORAGE = new ModEnergyStorage(400, 10) {
         @Override
         public void onEnergyChanged() {
@@ -126,8 +130,20 @@ public class FridgeBlockEntity extends TickableInventoryBlockEntity<ItemStackHan
         }
     };
 
+    private final MultiblockCapability<IEnergyStorage> energyCap = MultiblockCapability.make(
+            this, be -> be.energyCap, FridgeBlockEntity::master, registerEnergyStorage(ENERGY_STORAGE)
+    );
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityEnergy.ENERGY) {
+            return energyCap.getAndCast();
+        }
+        return super.getCapability(cap, side);
+    }
+
     private static final int ENERGY_REQ = 1;
-    private LazyOptional<IEnergyStorage> lazyEnergyHandler = LazyOptional.empty();
 
     public IEnergyStorage getEnergyStorage() {
         return ENERGY_STORAGE;
@@ -173,17 +189,6 @@ public class FridgeBlockEntity extends TickableInventoryBlockEntity<ItemStackHan
     }
 
     @Override
-    public void onLoad() {
-        lazyEnergyHandler = LazyOptional.of(() -> ENERGY_STORAGE);
-    }
-
-    @Override
-    public void invalidateCaps()  {
-        super.invalidateCaps();
-        lazyEnergyHandler.invalidate();
-    }
-
-    @Override
     public void loadAdditional(CompoundTag nbt)
     {
         lastPlayerTick = nbt.getLong("lastPlayerTick");
@@ -193,19 +198,10 @@ public class FridgeBlockEntity extends TickableInventoryBlockEntity<ItemStackHan
 
     @Override
     public void saveAdditional(CompoundTag nbt)
-    {;
+    {
         nbt.putLong("lastPlayerTick", lastPlayerTick);
         nbt.putInt("energy", ENERGY_STORAGE.getEnergyStored());
         super.saveAdditional(nbt);
-    }
-
-    public void drops() {
-        SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
-        for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-            inventory.setItem(slot, itemHandler.getStackInSlot(slot));
-        }
-
-        Containers.dropContents(this.level, this.worldPosition, inventory);
     }
 
     @Override

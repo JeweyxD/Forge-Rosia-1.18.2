@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, Rosia.MOD_ID);
@@ -198,11 +199,16 @@ public class ModBlocks {
                 new Item.Properties().tab(tab)));
     }
 
-    private static <T extends Block> RegistryObject<T> register(String name, Supplier<T> blockSupplier, CreativeModeTab group)
-    {
-        return register(name, blockSupplier, block -> new BlockItem(block, new Item.Properties().tab(group)));
+    private static <T extends Block> RegistryObject<T> register(String name, Supplier<T> blockSupplier, CreativeModeTab group) {
+        return register(name, blockSupplier, block -> {
+            if (block instanceof MultiblockDevice device) {
+                return device.blockItemSupplier(group).get();
+            }
+            else {
+                return new BlockItem(block, new Item.Properties().tab(group));
+            }
+        });
     }
-
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

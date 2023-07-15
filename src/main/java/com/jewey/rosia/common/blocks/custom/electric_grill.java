@@ -1,79 +1,60 @@
 package com.jewey.rosia.common.blocks.custom;
 
+import com.jewey.rosia.common.blocks.MultiblockDevice;
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
 import com.jewey.rosia.common.blocks.entity.block_entity.ElectricGrillBlockEntity;
 import net.dries007.tfc.common.blocks.ExtendedProperties;
-import net.dries007.tfc.common.blocks.devices.DeviceBlock;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
-public class electric_grill extends DeviceBlock
+public class electric_grill extends MultiblockDevice
 {
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public static final BooleanProperty ON = BooleanProperty.create("on");
-
-    // Voxel Shape
-    private static final VoxelShape SHAPE_N = Block.box(0,0,0,32,14,16);
-    private static final VoxelShape SHAPE_S = Block.box(-16,0,0,16,14,16);
-    private static final VoxelShape SHAPE_W = Block.box(0,0,-16,16,14,16);
-    private static final VoxelShape SHAPE_E = Block.box(0,0,0,16,14,32);
-    @Override
-    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return switch (pState.getValue(FACING)) {
-            case SOUTH -> SHAPE_S;
-            case WEST -> SHAPE_W;
-            case EAST -> SHAPE_E;
-            default -> SHAPE_N;
-        };
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (pState.getBlock() != pNewState.getBlock()) {
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof ElectricGrillBlockEntity) {
-                ((ElectricGrillBlockEntity) blockEntity).drops();
-            }
-        }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-    }
-
     public electric_grill(ExtendedProperties properties)
     {
         super(properties, InventoryRemoveBehavior.DROP);
-        registerDefaultState(getStateDefinition().any().setValue(ON, false));
+    }
+
+    @Override
+    public Supplier<BlockItem> blockItemSupplier(CreativeModeTab group) {
+        return () -> new ElectricGrillBlockItem(this, group);
+    }
+
+    // Voxel Shape
+    private static final VoxelShape SHAPE = Block.box(0,0,0,16,14,16);
+
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return SHAPE;
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        ElectricGrillBlockEntity grill = ModBlockEntities.ELECTRIC_GRILL_BLOCK_ENTITY.get().create(pos, state);
+        assert grill != null;
+        grill.isDummy = state.getValue(DUMMY);
+        return grill;
     }
 
     @Override
@@ -105,33 +86,30 @@ public class electric_grill extends DeviceBlock
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
-    {
-        builder.add(ON);
-        builder.add(FACING);
+    public Direction getDummyOffsetDir(BlockState state) {
+        Direction facing = state.getValue(FACING);
+        return facing.getClockWise();
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result)
+    public static class ElectricGrillBlockItem extends BlockItem
     {
-        ElectricGrillBlockEntity forge = level.getBlockEntity(pos, ModBlockEntities.ELECTRIC_GRILL_BLOCK_ENTITY.get()).orElse(null);
-        if (forge != null)
+        public ElectricGrillBlockItem(Block block, CreativeModeTab group)
         {
-            if (player instanceof ServerPlayer serverPlayer)
-            {
-                Helpers.openScreen(serverPlayer, forge, pos);
-            }
-            return InteractionResult.SUCCESS;
+            super(block, new Item.Properties().tab(group));
         }
-        return InteractionResult.PASS;
-    }
 
+        @Override
+        protected boolean canPlace(BlockPlaceContext context, BlockState state)
+        {
+            if (super.canPlace(context, state))
+            {
+                Direction facing = state.getValue(FACING);
+                BlockPos start = context.getClickedPos();
+                BlockPos otherPos = start.relative(facing.getClockWise());
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type)
-    {
-        return false;
+                return areAllReplaceable(start, otherPos, context);
+            }
+            return false;
+        }
     }
 }
