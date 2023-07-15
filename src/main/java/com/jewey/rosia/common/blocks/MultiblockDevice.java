@@ -13,14 +13,18 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nonnull;
@@ -31,14 +35,24 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 public abstract class MultiblockDevice extends DeviceBlock {
 
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final BooleanProperty ON = BooleanProperty.create("on");
     public static final BooleanProperty DUMMY = BooleanProperty.create("dummy");
 
     public MultiblockDevice(ExtendedProperties properties, InventoryRemoveBehavior removeBehavior) {
         super(properties, removeBehavior);
+        registerDefaultState(getStateDefinition().any()
+                .setValue(ON, false)
+                .setValue(DUMMY, false));
     }
 
-    public Supplier<BlockItem> blockItemSupplier(CreativeModeTab group) {
-        return () -> new BlockItem(this, new Item.Properties().tab(group));
+    public abstract Supplier<BlockItem> blockItemSupplier(CreativeModeTab group);
+
+    public abstract Direction getDummyOffsetDir(BlockState state);
+
+    public BlockPos getDummyOffsetPos(BlockState state, BlockPos pos) {
+        Direction dummyDir = getDummyOffsetDir(state);
+        return pos.relative(dummyDir);
     }
 
     @Nonnull
@@ -60,23 +74,20 @@ public abstract class MultiblockDevice extends DeviceBlock {
         return super.use(state, level, pos, player, hand, hit);
     }
 
-    public abstract Direction getDummyOffsetDir();
-
-    public BlockPos getDummyOffsetPos(BlockPos pos) {
-        Direction dummyDir = getDummyOffsetDir();
-        return pos.relative(dummyDir);
+    @Override
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON, FACING, DUMMY);
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
-    {
-        builder.add(DUMMY);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if (!level.isClientSide) {
-            level.setBlockAndUpdate(getDummyOffsetPos(pos), state.setValue(DUMMY, true));
+            level.setBlockAndUpdate(getDummyOffsetPos(state, pos), state.setValue(DUMMY, true));
         }
         super.setPlacedBy(level, pos, state, placer, stack);
     }
@@ -84,11 +95,26 @@ public abstract class MultiblockDevice extends DeviceBlock {
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (state.getValue(DUMMY)) {
-            level.destroyBlock(pos.relative(getDummyOffsetDir().getOpposite()), !player.isCreative());
+            level.destroyBlock(pos.relative(getDummyOffsetDir(state).getOpposite()), false);
         } else {
-            level.destroyBlock(getDummyOffsetPos(pos), false);
+            level.destroyBlock(getDummyOffsetPos(state, pos), false);
         }
 
         super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type)
+    {
+        return false;
+    }
+
+    public static boolean areAllReplaceable(BlockPos start, BlockPos end, BlockPlaceContext context) {
+        Level level = context.getLevel();
+        return BlockPos.betweenClosedStream(start, end).allMatch(pos -> {
+            BlockPlaceContext subContext = BlockPlaceContext.at(context, pos, context.getClickedFace());
+            return level.getBlockState(pos).canBeReplaced(subContext);
+        });
     }
 }

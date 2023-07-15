@@ -51,18 +51,13 @@ public class FridgeBlockEntity extends MultiblockBlockEntity implements MenuProv
 
     @Override
     public FridgeBlockEntity master() {
-        if (isDummy()) {
+        if (isDummy) {
             assert level != null;
-            BlockEntity blockEntity = level.getBlockEntity(worldPosition.below());
+            BlockEntity blockEntity = level.getBlockEntity(getBlockPos().below());
             return (blockEntity instanceof FridgeBlockEntity fridge) ? fridge : null;
         } else {
             return this;
         }
-    }
-
-    @Override
-    public boolean isDummy() {
-        return isDummy;
     }
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(9) {

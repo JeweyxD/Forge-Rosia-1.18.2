@@ -69,6 +69,4 @@ public abstract class MultiblockBlockEntity extends TickableInventoryBlockEntity
 
     @Nullable
     public abstract MultiblockBlockEntity master();
-
-    public abstract boolean isDummy();
 }
