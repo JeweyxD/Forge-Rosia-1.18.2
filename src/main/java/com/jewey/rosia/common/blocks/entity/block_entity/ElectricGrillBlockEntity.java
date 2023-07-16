@@ -8,6 +8,7 @@ import com.jewey.rosia.common.container.ElectricGrillContainer;
 import com.jewey.rosia.networking.ModMessages;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
 import com.jewey.rosia.util.ModEnergyStorage;
+import net.dries007.tfc.common.capabilities.PartialItemHandler;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.FoodTraits;
 import net.dries007.tfc.common.capabilities.heat.HeatCapability;
@@ -34,6 +35,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -147,11 +150,25 @@ public class ElectricGrillBlockEntity extends MultiblockBlockEntity implements M
             this, be -> be.energyCap, ElectricGrillBlockEntity::master, registerEnergyStorage(ENERGY_STORAGE)
     );
 
+    private final MultiblockCapability<IItemHandler> inventoryHandler = MultiblockCapability.make(
+            this, be -> be.inventoryHandler, ElectricGrillBlockEntity::master,
+            registerCapability(new PartialItemHandler(inventory) {
+                @Nonnull
+                @Override
+                public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                    return isItemValid(slot, inventory.getStackInSlot(slot)) ? ItemStack.EMPTY : super.extractItem(slot, amount, simulate);
+                }
+            }.extractAll().insertAll())
+    );
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if(cap == CapabilityEnergy.ENERGY) {
+        if (cap == CapabilityEnergy.ENERGY) {
             return energyCap.getAndCast();
+        }
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return inventoryHandler.getAndCast();
         }
         return super.getCapability(cap, side);
     }
