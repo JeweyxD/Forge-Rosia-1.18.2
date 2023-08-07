@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -150,7 +151,9 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
         @Override
         public void onEnergyChanged() {
             setChanged();
-            ModMessages.sendToClients(new EnergySyncS2CPacket(this.energy, getBlockPos()));
+            if (getLevel() instanceof ServerLevel) {
+                ModMessages.sendToClients(new EnergySyncS2CPacket(this.energy, getBlockPos()));
+            }
         }
     };
     private static final int ENERGY_REQ = 50; // Energy cost to craft item

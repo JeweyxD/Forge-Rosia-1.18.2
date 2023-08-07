@@ -17,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -150,7 +151,9 @@ public class ExtrudingMachineBlockEntity extends BlockEntity implements MenuProv
         @Override
         public void onEnergyChanged() {
             setChanged();
-            ModMessages.sendToClients(new EnergySyncS2CPacket(this.energy, getBlockPos()));
+            if (getLevel() instanceof ServerLevel) {
+                ModMessages.sendToClients(new EnergySyncS2CPacket(this.energy, getBlockPos()));
+            }
         }
     };
     private static final int ENERGY_REQ = 50; // Energy cost to craft item
