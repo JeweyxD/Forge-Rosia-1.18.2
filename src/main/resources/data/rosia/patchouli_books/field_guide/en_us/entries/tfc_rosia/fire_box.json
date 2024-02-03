@@ -10,11 +10,11 @@
     {
       "type": "patchouli:crafting",
       "recipe": "rosia:crafting/blocks/fire_box",
-      "text": "The $(thing)Fire Box$() has built-in ignition, allowing for easier use."
+      "text": "The $(thing)Fire Box$() is made with fire bricks and a $(l:mechanics/crucible)Crucible$().$(br2)Light with a Firestarter."
     },
     {
       "type": "patchouli:text",
-      "text": "The Fire Box does not require a chimney to operate.$(br2)A $(l:mechanics/bellows)Bellows$() can be placed adjacent to the Fire Box, in order to increase the maximum temperature it can reach.$(br2)The Fire Box cannot heat items on its own; however, its usefulness when combined with a $(l:mechanics/crucible)Crucible$() or $(thing)Steam Generator$() is unmatched."
+      "text": "The Fire Box does not require a chimney to operate.$(br2)A $(l:mechanics/bellows)Bellows$() can be placed adjacent to the Fire Box, in order to increase the maximum temperature it can reach.$(br2)The Fire Box cannot heat items on its own; however, its usefulness when combined with a heat-consuming device, like a $(l:mechanics/crucible)Crucible$() or $(thing)Steam Generator$(), is unmatched."
     },
     {
       "type": "patchouli:image",

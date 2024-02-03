@@ -10,6 +10,7 @@
 
 #### Efficient Heat Generation
 ###### Fire Box - Burn fuels with greater yield
+###### Lava Basin - Consume lava as long lasting fuel
 
 #### Efficient Charcoal Creation
 ###### Charcoal Kiln - Converts logs into charcoal faster and with higher yield
@@ -28,6 +29,7 @@
 ###### Extruding Machine - Form hot metal into rods
 ###### Rolling Machine - Form hot metal into sheets
 ###### Electric Loom - Weave string into cloth
+###### Scraping Machine - Scrape and refine paper and leather
 
 #### Food Preparation and Preservation
 ###### Canned Food - Can food to preserve it longer
@@ -35,8 +37,13 @@
 ###### Fridge - Keep food fresh for longer
 
 #### QOL
+###### Boiling Cauldron - Boil pot recipes in bulk
 ###### Stone Paths - Increase movement speed; perfect for long roads
 ###### Leather Satchel - An inventory item with five slots
 ###### Tool Belt - An inventory item with five slots for carrying tools
 ###### Electric Lantern - Cheap long-term lighting
 ###### Iron Support Beams - Support beams with 11x7x11 range
+
+#### New Advancements and Guidebook Entries
+###### Rosia Advancement Tree - Guideline for progressing the mod
+###### Rosia Guidebook Chapter - Detailed entries for each new item

@@ -18,6 +18,9 @@
     "rosia:charcoal_kiln",
     "rosia:canning_press",
     "rosia:electric_loom",
+    "rosia:scraping_machine",
+    "rosia:boiling_cauldron",
+    "rosia:lava_basin",
 
     "rosia:andesite_path",
     "rosia:basalt_path",

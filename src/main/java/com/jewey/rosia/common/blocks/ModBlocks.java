@@ -49,18 +49,20 @@ public class ModBlocks {
                     .blockEntity(ModBlockEntities.STEAM_GENERATOR_BLOCK_ENTITY)
                     .serverTicks(SteamGeneratorBlockEntity::serverTick)), ModCreativeModeTab.ROSIA_TAB);
 
-    public static final RegistryObject<Block> NICKEL_IRON_BATTERY = registerBlock("nickel_iron_battery",
-            () -> new nickel_iron_battery(BlockBehaviour.Properties.of(Material.METAL).strength(5f).requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)), ModCreativeModeTab.ROSIA_TAB);
+    public static final Supplier<? extends Block> NICKEL_IRON_BATTERY = register("nickel_iron_battery",
+            () -> new nickel_iron_battery(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.NICKEL_IRON_BATTERY_BLOCK_ENTITY)
+                    .serverTicks(NickelIronBatteryBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
 
     public static final Supplier<? extends Block> WATER_PUMP = register("water_pump",
             () -> new water_pump(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
                     .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.WATER_PUMP_BLOCK_ENTITY)
                     .serverTicks(WaterPumpBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
 
-    public static final RegistryObject<Block> AUTO_QUERN = registerBlock("auto_quern",
-            () -> new auto_quern(BlockBehaviour.Properties.of(Material.METAL).strength(5f).requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)), ModCreativeModeTab.ROSIA_TAB);
+    public static final Supplier<? extends Block> AUTO_QUERN = register("auto_quern",
+            () -> new auto_quern(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.AUTO_QUERN_BLOCK_ENTITY)
+                    .serverTicks(AutoQuernBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
 
     public static final Supplier<? extends Block> EXTRUDING_MACHINE = register("extruding_machine",
             () -> new extruding_machine(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
@@ -77,15 +79,33 @@ public class ModBlocks {
                     .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.ELECTRIC_LOOM_BLOCK_ENTITY)
                     .serverTicks(ElectricLoomBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
 
+    public static final Supplier<? extends Block> SCRAPING_MACHINE = register("scraping_machine",
+            () -> new scraping_machine(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.SCRAPING_MACHINE_BLOCK_ENTITY)
+                    .serverTicks(ScrapingMachineBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
+
+    public static final Supplier<? extends Block> LAVA_BASIN = register("lava_basin",
+            () -> new lava_basin(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).lightLevel((state) -> state.getValue(lava_basin.LIT) ? 15 : 0)
+                    .pathType(BlockPathTypes.DAMAGE_FIRE).blockEntity(ModBlockEntities.LAVA_BASIN_BLOCK_ENTITY)
+                    .serverTicks(LavaBasinBlockEntity::serverTick)), ModCreativeModeTab.ROSIA_TAB);
+
     public static final Supplier<? extends Block> ELECTRIC_FORGE = register("electric_forge",
             () -> new electric_forge(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
                     .randomTicks().sound(SoundType.METAL).lightLevel((state) -> state.getValue(electric_forge.HEAT) * 2)
                     .pathType(BlockPathTypes.DAMAGE_FIRE).blockEntity(ModBlockEntities.ELECTRIC_FORGE_BLOCK_ENTITY)
                     .serverTicks(ElectricForgeBlockEntity::serverTick)), ModCreativeModeTab.ROSIA_TAB);
 
-    public static final RegistryObject<Block> CANNING_PRESS = registerBlock("canning_press",
-            () -> new canning_press(BlockBehaviour.Properties.of(Material.METAL).strength(5f).requiresCorrectToolForDrops()
-                    .sound(SoundType.METAL)), ModCreativeModeTab.ROSIA_TAB);
+    public static final Supplier<? extends Block> BOILING_CAULDRON = register("boiling_cauldron",
+            () -> new boiling_cauldron(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).pathType(BlockPathTypes.DAMAGE_FIRE)
+                    .blockEntity(ModBlockEntities.BOILING_CAULDRON_BLOCK_ENTITY)
+                    .serverTicks(BoilingCauldronBlockEntity::serverTick)), ModCreativeModeTab.ROSIA_TAB);
+
+    public static final Supplier<? extends Block> CANNING_PRESS = register("canning_press",
+            () -> new canning_press(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()
+                    .randomTicks().sound(SoundType.METAL).blockEntity(ModBlockEntities.CANNING_PRESS_BLOCK_ENTITY)
+                    .serverTicks(CanningPressBlockEntity::serverTick).noOcclusion()), ModCreativeModeTab.ROSIA_TAB);
 
     public static final Supplier<? extends Block> ELECTRIC_GRILL = register("electric_grill",
             () -> new electric_grill(ExtendedProperties.of(Material.METAL, MaterialColor.METAL).strength(5f).requiresCorrectToolForDrops()

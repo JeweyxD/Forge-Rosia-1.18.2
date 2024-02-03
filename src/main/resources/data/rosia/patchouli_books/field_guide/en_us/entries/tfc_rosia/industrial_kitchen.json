@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "The $(thing)Canning Press$() is used to seal canned food items. Unsealed cans will expire within a few days.",
+      "text": "The $(thing)Canning Press$() is used to seal canned food items.$(br2)Unsealed cans will expire faster than sealed cans.",
       "title": "Canning Press"
     },
     {
@@ -42,5 +42,5 @@
     }
   ],
   "read_by_default": true,
-  "sortnum": 12
+  "sortnum": 14
 }

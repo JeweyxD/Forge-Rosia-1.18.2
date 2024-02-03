@@ -53,7 +53,6 @@ public class Rosia
 
         ModBlockEntities.register(eventBus);
         ModContainerTypes.CONTAINERS.register(eventBus);
-        ModMenuTypes.register(eventBus);
 
         ModEntities.ENTITY_TYPES.register(eventBus);
 

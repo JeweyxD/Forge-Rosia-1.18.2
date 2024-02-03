@@ -88,7 +88,7 @@ public class CharcoalKilnBlockEntity extends TickableInventoryBlockEntity<ItemSt
     public static void convert(CharcoalKilnBlockEntity kiln) {
         for (int slot = SLOT_MIN; slot <= SLOT_MAX; slot++) {
             final ItemStack inputStack = kiln.inventory.getStackInSlot(slot);
-            final int amount = Mth.clamp((int) (kiln.inventory.getStackInSlot(slot).getCount() * 0.9), 1, 8); // Return 90% to charcoal
+            final int amount = Mth.clamp((int) (kiln.inventory.getStackInSlot(slot).getCount() * 0.75), 1, 8); // Return 75% to charcoal
             final ItemStack charStack = new ItemStack(Items.CHARCOAL, amount);
             if (!inputStack.isEmpty() && Helpers.isItem(inputStack.getItem(), TFCTags.Items.LOG_PILE_LOGS)) {
                 kiln.inventory.setStackInSlot(slot, charStack);

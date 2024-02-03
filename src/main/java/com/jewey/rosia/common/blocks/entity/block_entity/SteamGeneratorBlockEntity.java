@@ -65,7 +65,6 @@ public class SteamGeneratorBlockEntity extends TickableInventoryBlockEntity<Stea
     private static final TranslatableComponent NAME = Helpers.translatable(MOD_ID + ".block_entity.steam_generator");
     private static final int TARGET_TEMPERATURE_STABILITY_TICKS = 5;
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SteamGeneratorBlockEntity generator) {
         generator.checkForLastTickSync();
@@ -140,7 +139,7 @@ public class SteamGeneratorBlockEntity extends TickableInventoryBlockEntity<Stea
     }
 
     private static void transferItemFluidToFluidTank(SteamGeneratorBlockEntity generator) {
-        generator.itemHandler.getStackInSlot(0).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(handler -> {
+        generator.inventory.getStackInSlot(0).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(handler -> {
             int drainAmount = Math.min(generator.FLUID_TANK.getSpace(), 1000);
 
             FluidStack stack = handler.drain(drainAmount, IFluidHandler.FluidAction.SIMULATE);
@@ -153,12 +152,12 @@ public class SteamGeneratorBlockEntity extends TickableInventoryBlockEntity<Stea
 
     private static void fillTankWithFluid(SteamGeneratorBlockEntity generator, FluidStack stack, ItemStack container) {
         generator.FLUID_TANK.fill(stack, IFluidHandler.FluidAction.EXECUTE);
-        generator.itemHandler.extractItem(0, 1, false);
-        generator.itemHandler.insertItem(0, container, false);
+        generator.inventory.extractItem(0, 1, false);
+        generator.inventory.insertItem(0, container, false);
     }
 
     private static boolean hasFluidItemInSourceSlot(SteamGeneratorBlockEntity generator) {
-        return generator.itemHandler.getStackInSlot(0).getCount() > 0;
+        return generator.inventory.getStackInSlot(0).getCount() > 0;
     }
 
 
@@ -248,7 +247,6 @@ public class SteamGeneratorBlockEntity extends TickableInventoryBlockEntity<Stea
     @Override
     public void onLoad() {
         super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> itemHandler);
         lazyEnergyHandler = LazyOptional.of(() -> ENERGY_STORAGE);
         lazyFluidHandler = LazyOptional.of(() -> FLUID_TANK);
     }
@@ -300,11 +298,6 @@ public class SteamGeneratorBlockEntity extends TickableInventoryBlockEntity<Stea
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if(side == null) {
-                return lazyItemHandler.cast();
-            }
-        }
         if(cap == CapabilityEnergy.ENERGY) {
             return lazyEnergyHandler.cast();
         }

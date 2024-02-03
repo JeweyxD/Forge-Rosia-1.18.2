@@ -1,7 +1,11 @@
 package com.jewey.rosia.networking.packet;
 
+import com.jewey.rosia.common.blocks.entity.block_entity.BoilingCauldronBlockEntity;
+import com.jewey.rosia.common.blocks.entity.block_entity.LavaBasinBlockEntity;
 import com.jewey.rosia.common.blocks.entity.block_entity.WaterPumpBlockEntity;
 import com.jewey.rosia.common.blocks.entity.block_entity.SteamGeneratorBlockEntity;
+import com.jewey.rosia.common.container.BoilingCauldronContainer;
+import com.jewey.rosia.common.container.LavaBasinContainer;
 import com.jewey.rosia.common.container.WaterPumpContainer;
 import com.jewey.rosia.common.container.SteamGeneratorContainer;
 import net.minecraft.client.Minecraft;
@@ -46,6 +50,22 @@ public class FluidSyncS2CPacket {
                 blockEntity.setFluid(this.fluidStack);
 
                 if(Minecraft.getInstance().player.containerMenu instanceof WaterPumpContainer menu &&
+                        menu.getBlockEntity().getBlockPos().equals(pos)) {
+                    menu.setFluid(this.fluidStack);
+                }
+            }
+            if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof BoilingCauldronBlockEntity blockEntity) {
+                blockEntity.setFluid(this.fluidStack);
+
+                if(Minecraft.getInstance().player.containerMenu instanceof BoilingCauldronContainer menu &&
+                        menu.getBlockEntity().getBlockPos().equals(pos)) {
+                    menu.setFluid(this.fluidStack);
+                }
+            }
+            if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof LavaBasinBlockEntity blockEntity) {
+                blockEntity.setFluid(this.fluidStack);
+
+                if(Minecraft.getInstance().player.containerMenu instanceof LavaBasinContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     menu.setFluid(this.fluidStack);
                 }

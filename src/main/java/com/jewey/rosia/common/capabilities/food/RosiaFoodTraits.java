@@ -6,7 +6,7 @@ import net.dries007.tfc.util.Helpers;
 public class RosiaFoodTraits {
     public static final FoodTrait BOUND = register("bound", 0.7F);
     public static final FoodTrait REFRIGERATED = register("refrigerated", 0.25F);
-    public static final FoodTrait CANNED = register("canned", 0.2F);
+    public static final FoodTrait SEALED = register("sealed", 0.2F);
 
     public RosiaFoodTraits() {
     }

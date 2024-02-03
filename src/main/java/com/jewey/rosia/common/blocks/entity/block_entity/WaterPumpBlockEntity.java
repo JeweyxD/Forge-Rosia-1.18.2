@@ -76,18 +76,24 @@ public class WaterPumpBlockEntity extends TickableInventoryBlockEntity<WaterPump
 
         // Pump water | only pump if there is enough room in the tank to not waste FE
         if (pump.ENERGY_STORAGE.getEnergyStored() >= ENERGY_REQ && state.getValue(BlockStateProperties.WATERLOGGED)
-                && pump.FLUID_TANK.getFluidAmount() <= pump.FLUID_TANK.getCapacity() - FILL_AMOUNT) {
+                && pump.FLUID_TANK.getFluidAmount() <= pump.FLUID_TANK.getCapacity() - FILL_AMOUNT)
+        {
             FluidStack stack = new FluidStack(Fluids.WATER, FILL_AMOUNT);
             pump.FLUID_TANK.fill(stack, IFluidHandler.FluidAction.EXECUTE);
             pump.ENERGY_STORAGE.extractEnergy(ENERGY_REQ, false);
+            pump.markForSync();
         }
 
         if (hasFluidItemInSourceSlot(pump)) {
             transferItemFluidToFluidTank(pump);
+            pump.markForSync();
         }
-        //output fluid on block sides
-        pump.outputFluid();
-        pump.setChanged();
+        //Output fluid on block sides if pump has energy (even though the process is free)
+        if (pump.ENERGY_STORAGE.getEnergyStored() >= ENERGY_REQ)
+        {
+            pump.outputFluid();
+            pump.markForSync();
+        }
     }
 
     private static final int ENERGY_REQ = 1; // Energy cost to pump water

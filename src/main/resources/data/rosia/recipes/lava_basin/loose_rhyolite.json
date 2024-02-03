@@ -1,0 +1,7 @@
+{
+  "type": "rosia:lava_basin",
+  "output": {
+    "item": "tfc:rock/loose/rhyolite",
+    "count": 1
+  }
+}

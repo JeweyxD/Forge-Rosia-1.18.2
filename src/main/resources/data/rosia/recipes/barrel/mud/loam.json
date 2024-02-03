@@ -7,7 +7,7 @@
   },
   "input_fluid": {
     "ingredient": "minecraft:water",
-    "amount": 200
+    "amount": 125
   },
   "output_item": {
     "item": "tfc:mud/loam"

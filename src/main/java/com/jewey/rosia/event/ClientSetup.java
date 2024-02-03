@@ -13,19 +13,22 @@ public class ClientSetup {
     public static void register() {
         //SCREEN REGISTER
             //BLOCK INVENTORY
-        MenuScreens.register(ModMenuTypes.AUTO_QUERN_MENU.get(), AutoQuernScreen::new);
+        MenuScreens.register(ModContainerTypes.AUTO_QUERN.get(), AutoQuernScreen::new);
         MenuScreens.register(ModContainerTypes.FIRE_BOX.get(), FireBoxScreenFinal::new);
         MenuScreens.register(ModContainerTypes.STEAM_GENERATOR.get(), SteamGeneratorScreen::new);
         MenuScreens.register(ModContainerTypes.NICKEL_IRON_BATTERY.get(), NickelIronBatteryScreen::new);
         MenuScreens.register(ModContainerTypes.WATER_PUMP.get(), WaterPumpScreen::new);
-        MenuScreens.register(ModMenuTypes.EXTRUDING_MACHINE_MENU.get(), ExtrudingMachineScreen::new);
-        MenuScreens.register(ModMenuTypes.ROLLING_MACHINE_MENU.get(), RollingMachineScreen::new);
+        MenuScreens.register(ModContainerTypes.EXTRUDING_MACHINE.get(), ExtrudingMachineScreen::new);
+        MenuScreens.register(ModContainerTypes.ROLLING_MACHINE.get(), RollingMachineScreen::new);
         MenuScreens.register(ModContainerTypes.ELECTRIC_FORGE.get(), ElectricForgeScreen::new);
         MenuScreens.register(ModContainerTypes.ELECTRIC_GRILL.get(), ElectricGrillScreen::new);
         MenuScreens.register(ModContainerTypes.FRIDGE.get(), FridgeScreen::new);
         MenuScreens.register(ModContainerTypes.CHARCOAL_KILN.get(), CharcoalKilnScreen::new);
-        MenuScreens.register(ModMenuTypes.CANNING_PRESS_MENU.get(), CanningPressScreen::new);
-        MenuScreens.register(ModMenuTypes.ELECTRIC_LOOM_MENU.get(), ElectricLoomScreen::new);
+        MenuScreens.register(ModContainerTypes.CANNING_PRESS.get(), CanningPressScreen::new);
+        MenuScreens.register(ModContainerTypes.ELECTRIC_LOOM.get(), ElectricLoomScreen::new);
+        MenuScreens.register(ModContainerTypes.SCRAPING_MACHINE.get(), ScrapingMachineScreen::new);
+        MenuScreens.register(ModContainerTypes.BOILING_CAULDRON.get(), BoilingCauldronScreen::new);
+        MenuScreens.register(ModContainerTypes.LAVA_BASIN.get(), LavaBasinScreen::new);
             //ITEM INVENTORY
         MenuScreens.register(ModContainerTypes.LEATHER_SATCHEL.get(), LeatherSatchelScreen::new);
         MenuScreens.register(ModContainerTypes.TOOL_BELT.get(), ToolBeltScreen::new);
@@ -48,6 +51,9 @@ public class ClientSetup {
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.CHARCOAL_KILN.get(), RenderType.solid());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.CANNING_PRESS.get(), RenderType.solid());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.ELECTRIC_LOOM.get(), RenderType.solid());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.SCRAPING_MACHINE.get(), RenderType.solid());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.BOILING_CAULDRON.get(), RenderType.solid());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.LAVA_BASIN.get(), RenderType.solid());
 
         //FLUID RENDER
         ItemBlockRenderTypes.setRenderLayer(ModFluids.INVAR_BLOCK.get(), RenderType.solid());

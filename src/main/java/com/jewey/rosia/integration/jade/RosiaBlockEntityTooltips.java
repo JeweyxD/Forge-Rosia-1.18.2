@@ -1,15 +1,10 @@
 package com.jewey.rosia.integration.jade;
 
-import com.jewey.rosia.common.blocks.custom.charcoal_kiln;
-import com.jewey.rosia.common.blocks.custom.electric_forge;
-import com.jewey.rosia.common.blocks.custom.fire_box;
-import com.jewey.rosia.common.blocks.custom.steam_generator;
-import com.jewey.rosia.common.blocks.entity.block_entity.CharcoalKilnBlockEntity;
-import com.jewey.rosia.common.blocks.entity.block_entity.ElectricForgeBlockEntity;
-import com.jewey.rosia.common.blocks.entity.block_entity.FireBoxBlockEntity;
-import com.jewey.rosia.common.blocks.entity.block_entity.SteamGeneratorBlockEntity;
+import com.jewey.rosia.common.blocks.custom.*;
+import com.jewey.rosia.common.blocks.entity.block_entity.*;
 import net.dries007.tfc.common.capabilities.heat.HeatCapability;
 import net.dries007.tfc.compat.jade.common.BlockEntityTooltip;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 
 import java.util.function.BiConsumer;
@@ -24,6 +19,8 @@ public class RosiaBlockEntityTooltips {
         registerBlock.accept(FIRE_BOX, fire_box.class);
         registerBlock.accept(STEAM_GENERATOR, steam_generator.class);
         registerBlock.accept(ELECTRIC_FORGE, electric_forge.class);
+        registerBlock.accept(BOILING_CAULDRON, boiling_cauldron.class);
+        registerBlock.accept(LAVA_BASIN, lava_basin.class);
     }
 
     public static final BlockEntityTooltip KILN = (level, state, pos, entity, tooltip) -> {
@@ -55,6 +52,22 @@ public class RosiaBlockEntityTooltips {
         if (entity instanceof ElectricForgeBlockEntity forge)
         {
             heat(tooltip, forge.getTemperature());
+        }
+    };
+    public static final BlockEntityTooltip BOILING_CAULDRON = (level, state, pos, entity, tooltip) -> {
+        if (entity instanceof BoilingCauldronBlockEntity boiler)
+        {
+            heat(tooltip, boiler.getTemperature());
+        }
+        if (state.getValue(boiling_cauldron.LIT))
+        {
+            tooltip.accept(Component.nullToEmpty("Boiling!"));
+        }
+    };
+    public static final BlockEntityTooltip LAVA_BASIN = (level, state, pos, entity, tooltip) -> {
+        if (entity instanceof LavaBasinBlockEntity boiler)
+        {
+            heat(tooltip, boiler.getTemperature());
         }
     };
 }

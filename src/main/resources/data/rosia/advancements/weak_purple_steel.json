@@ -9,7 +9,7 @@
     "show_toast": true,
     "announce_to_chat": true
   },
-  "parent": "rosia:hot_topic",
+  "parent": "rosia:fire_box",
   "criteria": {
     "requirement": {
       "trigger": "minecraft:inventory_changed",

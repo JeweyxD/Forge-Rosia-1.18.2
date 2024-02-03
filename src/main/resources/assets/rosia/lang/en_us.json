@@ -31,10 +31,13 @@
   "item.rosia.tool_belt": "Tool Belt",
   "item.rosia.unfinished_tool_belt": "Unfinished Tool Belt",
 
-  "item.rosia.purple_steel_rifle": "Purple Steel Rifle",
   "item.rosia.bullets": "Bullets",
   "item.rosia.rifle_ammo": "Rifle Ammo",
 
+  "item.rosia.purple_steel_rifle": "Purple Steel Rifle",
+  "item.rosia.purple_steel_tuyere": "Purple Steel Tuyere",
+  "item.rosia.purple_steel_fish_hook": "Purple Steel Fish Hook",
+  "item.rosia.purple_steel_fishing_rod": "Purple Steel Fishing Rod",
   "item.rosia.purple_steel_pickaxe": "Purple Steel Pickaxe",
   "item.rosia.purple_steel_propick": "Purple Steel Prospector's Pick",
   "item.rosia.purple_steel_axe": "Purple Steel Axe",
@@ -43,6 +46,7 @@
   "item.rosia.purple_steel_chisel": "Purple Steel Chisel",
   "item.rosia.purple_steel_hammer": "Purple Steel Hammer",
   "item.rosia.purple_steel_saw": "Purple Steel Saw",
+  "item.rosia.purple_steel_javelin": "Purple Steel Javelin",
   "item.rosia.purple_steel_sword": "Purple Steel Sword",
   "item.rosia.purple_steel_mace": "Purple Steel Mace",
   "item.rosia.purple_steel_knife": "Purple Steel Knife",
@@ -57,6 +61,7 @@
   "item.rosia.purple_steel_chisel_head": "Purple Steel Chisel Head",
   "item.rosia.purple_steel_hammer_head": "Purple Steel Hammer Head",
   "item.rosia.purple_steel_saw_blade": "Purple Steel Saw Blade",
+  "item.rosia.purple_steel_javelin_head": "Purple Steel Javelin Head",
   "item.rosia.purple_steel_sword_blade": "Purple Steel Sword Blade",
   "item.rosia.purple_steel_mace_head": "Purple Steel Mace Head",
   "item.rosia.purple_steel_knife_blade": "Purple Steel Knife Blade",
@@ -70,6 +75,8 @@
   "item.rosia.purple_steel_unfinished_greaves": "Purple Steel Unfinished Greaves",
   "item.rosia.purple_steel_boots": "Purple Steel Boots",
   "item.rosia.purple_steel_unfinished_boots": "Purple Steel Unfinished Boots",
+  "item.rosia.purple_steel_horse_armor": "Purple Steel Horse Armor",
+  "item.rosia.purple_steel_shield": "Purple Steel Shield",
 
   "item.rosia.iron_support": "Iron Support",
 
@@ -121,6 +128,9 @@
   "block.rosia.charcoal_kiln": "Charcoal Kiln",
   "block.rosia.canning_press": "Canning Press",
   "block.rosia.electric_loom": "Electric Loom",
+  "block.rosia.scraping_machine": "Scraping Machine",
+  "block.rosia.boiling_cauldron": "Boiling Cauldron",
+  "block.rosia.lava_basin": "Lava Basin",
 
   "fluid.rosia.invar_fluid": "Invar",
   "metal.rosia.invar": "Invar",
@@ -131,7 +141,7 @@
 
   "tfc.tooltip.food_trait.bound": "Leather Bound",
   "tfc.tooltip.food_trait.refrigerated": "Refrigerated",
-  "tfc.tooltip.food_trait.canned": "Canned",
+  "tfc.tooltip.food_trait.canned": "Sealed",
 
   "effect.rosia.path_speed": "Path Speed",
 

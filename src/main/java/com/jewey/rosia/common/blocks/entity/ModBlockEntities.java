@@ -20,10 +20,7 @@ public class ModBlockEntities {
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Rosia.MOD_ID);
 
     public static final RegistryObject<BlockEntityType<AutoQuernBlockEntity>> AUTO_QUERN_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("auto_quern_block_entity", () ->
-                    BlockEntityType.Builder.of(AutoQuernBlockEntity::new,
-                            ModBlocks.AUTO_QUERN.get()).build(null));
-
+            register("auto_quern_block_entity", AutoQuernBlockEntity::new, ModBlocks.AUTO_QUERN);
 
     public static final RegistryObject<BlockEntityType<FireBoxBlockEntity>> FIRE_BOX_BLOCK_ENTITY =
             register("fire_box_block_entity", FireBoxBlockEntity::new, ModBlocks.FIRE_BOX);
@@ -32,9 +29,7 @@ public class ModBlockEntities {
             register("steam_generator_block_entity", SteamGeneratorBlockEntity::new, ModBlocks.STEAM_GENERATOR);
 
     public static final RegistryObject<BlockEntityType<NickelIronBatteryBlockEntity>> NICKEL_IRON_BATTERY_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("nickel_iron_battery_block_entity", () ->
-                    BlockEntityType.Builder.of(NickelIronBatteryBlockEntity::new,
-                            ModBlocks.NICKEL_IRON_BATTERY.get()).build(null));
+            register("nickel_iron_battery_block_entity", NickelIronBatteryBlockEntity::new, ModBlocks.NICKEL_IRON_BATTERY);
 
     public static final RegistryObject<BlockEntityType<WaterPumpBlockEntity>> WATER_PUMP_BLOCK_ENTITY =
             register("water_pump_block_entity", WaterPumpBlockEntity::new, ModBlocks.WATER_PUMP);
@@ -61,12 +56,19 @@ public class ModBlockEntities {
             register("charcoal_kiln_block_entity", CharcoalKilnBlockEntity::new, ModBlocks.CHARCOAL_KILN);
 
     public static final RegistryObject<BlockEntityType<CanningPressBlockEntity>> CANNING_PRESS_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("canning_press_block_entity", () ->
-                    BlockEntityType.Builder.of(CanningPressBlockEntity::new,
-                            ModBlocks.CANNING_PRESS.get()).build(null));
+            register("canning_press_block_entity", CanningPressBlockEntity::new, ModBlocks.CANNING_PRESS);
 
     public static final RegistryObject<BlockEntityType<ElectricLoomBlockEntity>> ELECTRIC_LOOM_BLOCK_ENTITY =
             register("electric_loom_block_entity", ElectricLoomBlockEntity::new, ModBlocks.ELECTRIC_LOOM);
+
+    public static final RegistryObject<BlockEntityType<ScrapingMachineBlockEntity>> SCRAPING_MACHINE_BLOCK_ENTITY =
+            register("scraping_machine_block_entity", ScrapingMachineBlockEntity::new, ModBlocks.SCRAPING_MACHINE);
+
+    public static final RegistryObject<BlockEntityType<BoilingCauldronBlockEntity>> BOILING_CAULDRON_BLOCK_ENTITY =
+            register("boiling_cauldron_block_entity", BoilingCauldronBlockEntity::new, ModBlocks.BOILING_CAULDRON);
+
+    public static final RegistryObject<BlockEntityType<LavaBasinBlockEntity>> LAVA_BASIN_BLOCK_ENTITY =
+            register("lava_basin_block_entity", LavaBasinBlockEntity::new, ModBlocks.LAVA_BASIN);
 
 
     public static void register(IEventBus eventBus) {

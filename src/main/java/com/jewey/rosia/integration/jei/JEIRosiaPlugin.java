@@ -1,9 +1,7 @@
 package com.jewey.rosia.integration.jei;
 
 import com.jewey.rosia.common.blocks.ModBlocks;
-import com.jewey.rosia.recipe.ElectricLoomRecipe;
-import com.jewey.rosia.recipe.ExtrudingMachineRecipe;
-import com.jewey.rosia.recipe.RollingMachineRecipe;
+import com.jewey.rosia.recipe.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
@@ -11,7 +9,6 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import com.jewey.rosia.Rosia;
-import com.jewey.rosia.recipe.AutoQuernRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -33,6 +30,8 @@ public class JEIRosiaPlugin implements IModPlugin {
         registration.addRecipeCategories(new ExtrudingMachineRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new RollingMachineRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new ElectricLoomRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new ScrapingMachineRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new BoilingCauldronRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -50,6 +49,12 @@ public class JEIRosiaPlugin implements IModPlugin {
 
         List<ElectricLoomRecipe> electricLoomRecipes = rm.getAllRecipesFor(ElectricLoomRecipe.Type.INSTANCE);
         registration.addRecipes(new RecipeType<>(ElectricLoomRecipeCategory.UID, ElectricLoomRecipe.class), electricLoomRecipes);
+
+        List<ScrapingMachineRecipe> scrapingMachineRecipes = rm.getAllRecipesFor(ScrapingMachineRecipe.Type.INSTANCE);
+        registration.addRecipes(new RecipeType<>(ScrapingMachineRecipeCategory.UID, ScrapingMachineRecipe.class), scrapingMachineRecipes);
+
+        List<BoilingCauldronRecipe> boilingCauldronRecipes = rm.getAllRecipesFor(BoilingCauldronRecipe.Type.INSTANCE);
+        registration.addRecipes(new RecipeType<>(BoilingCauldronRecipeCategory.UID, BoilingCauldronRecipe.class), boilingCauldronRecipes);
     }
 
     @Override
@@ -59,5 +64,7 @@ public class JEIRosiaPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.EXTRUDING_MACHINE.get()), ExtrudingMachineRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.ROLLING_MACHINE.get()), RollingMachineRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.ELECTRIC_LOOM.get()), ElectricLoomRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.SCRAPING_MACHINE.get()), ScrapingMachineRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.BOILING_CAULDRON.get()), BoilingCauldronRecipeCategory.UID);
     }
 }

@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "The $(thing)Electric Forge$() has five slots for heating items and one slot for molds or vessels. The forge will also heat $(l:mechanics/crucible)Crucibles$() that are placed above it.$(br2)Click the temperature bar on the bottom to set the target temperature.$(br2)The higher the temperature, the more power is consumed."
+      "text": "The $(thing)Electric Forge$() has five slots for heating items and one slot for molds or vessels. The forge will also heat devices that are placed above it.$(br2)Click the temperature bar on the bottom to set the target temperature.$(br2)The higher the temperature, the more power is consumed."
     },
     {
       "type": "patchouli:image",

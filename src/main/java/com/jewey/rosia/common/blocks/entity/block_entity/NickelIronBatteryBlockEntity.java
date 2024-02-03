@@ -3,12 +3,14 @@ package com.jewey.rosia.common.blocks.entity.block_entity;
 import com.jewey.rosia.common.blocks.custom.nickel_iron_battery;
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
 import com.jewey.rosia.common.blocks.entity.WrappedHandlerEnergy;
+import com.jewey.rosia.common.container.AutoQuernContainer;
 import com.jewey.rosia.networking.ModMessages;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
-import com.jewey.rosia.screen.NickelIronBatteryContainer;
+import com.jewey.rosia.common.container.NickelIronBatteryContainer;
 import com.jewey.rosia.util.ModEnergyStorage;
 import net.dries007.tfc.common.blockentities.TickableInventoryBlockEntity;
 import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.IntArrayBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -43,26 +45,6 @@ import static com.jewey.rosia.Rosia.MOD_ID;
 public class NickelIronBatteryBlockEntity extends TickableInventoryBlockEntity<ItemStackHandler> implements MenuProvider {
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(0) {};
-    protected final ContainerData data;
-
-
-    public NickelIronBatteryBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.NICKEL_IRON_BATTERY_BLOCK_ENTITY.get(), pPos, pBlockState, defaultInventory(0), NAME);
-        this.data = new ContainerData() {
-            public int get(int index) {
-                return switch (index) {
-                    default -> 0;
-                };
-            }
-            public void set(int index, int value) {
-                switch (index) {
-                }
-            }
-            public int getCount() {
-                return 2;
-            }
-        };
-    }
 
     @Override
     public @NotNull Component getDisplayName() {
@@ -71,17 +53,24 @@ public class NickelIronBatteryBlockEntity extends TickableInventoryBlockEntity<I
 
     private static final TranslatableComponent NAME = Helpers.translatable(MOD_ID + ".block_entity.nickel_iron_battery");
 
-    public ContainerData getSyncableData()
-    {
-        return data;
+    private final IntArrayBuilder syncableData;
+
+    public NickelIronBatteryBlockEntity(BlockPos pPos, BlockState pBlockState) {
+        super(ModBlockEntities.NICKEL_IRON_BATTERY_BLOCK_ENTITY.get(), pPos, pBlockState, defaultInventory(0), NAME);
+
+        syncableData = new IntArrayBuilder();
     }
 
-    @javax.annotation.Nullable
+    public ContainerData getSyncableData() {
+        return syncableData;
+    }
+
+    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int windowID, Inventory playerInv, Player player)
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer)
     {
         ModMessages.sendToClients(new EnergySyncS2CPacket(this.ENERGY_STORAGE.getEnergyStored(), getBlockPos()));
-        return NickelIronBatteryContainer.create(this, playerInv, windowID);
+        return NickelIronBatteryContainer.create(this, pPlayerInventory, pContainerId);
     }
 
     @Override
@@ -119,7 +108,7 @@ public class NickelIronBatteryBlockEntity extends TickableInventoryBlockEntity<I
     };
 
     private final Map<Direction, LazyOptional<WrappedHandlerEnergy>> directionWrappedHandlerMap =
-            //Handler for sided energy: extract, receive, canExtract, canReceive
+            //Handler for sided energy: extract, receive, canExtract, canReceive (seems redundant, but it breaks otherwise because why not)
             //Determines what sides can perform actions
             Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandlerEnergy(ENERGY_STORAGE, (i) -> false, (i) -> true, false, true)),
                     Direction.UP, LazyOptional.of(() -> new WrappedHandlerEnergy(ENERGY_STORAGE,(i) -> true, (i) -> false, true, false)),
@@ -160,7 +149,7 @@ public class NickelIronBatteryBlockEntity extends TickableInventoryBlockEntity<I
     }
 
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, NickelIronBatteryBlockEntity battery) {
+    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, NickelIronBatteryBlockEntity battery) {
         //output energy on block side UP
         battery.outputEnergy();
         battery.setChanged();
@@ -212,6 +201,7 @@ public class NickelIronBatteryBlockEntity extends TickableInventoryBlockEntity<I
         Containers.dropContents(this.level, this.worldPosition, inventory);
     }
 
+    //For comparator output
     public int getRedstoneSignal() {
         float E = (float) this.ENERGY_STORAGE.getEnergyStored() / this.ENERGY_STORAGE.getMaxEnergyStored();
         return this.ENERGY_STORAGE.getEnergyStored() > 0 ? Mth.clamp(Mth.floor( E * 15), 1, 15) : 0;

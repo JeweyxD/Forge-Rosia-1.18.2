@@ -9,7 +9,9 @@
     }
   ],
   "output": {
-    "item": "tfc:food/maize_flour",
+    "stack": {
+      "item": "tfc:food/maize_flour"
+    },
     "count": 1,
     "modifiers": [
       "tfc:copy_food"

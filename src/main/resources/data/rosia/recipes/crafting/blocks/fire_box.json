@@ -7,7 +7,7 @@
   ],
   "key": {
     "V": {
-      "item": "minecraft:flint_and_steel"
+      "tag": "forge:stone"
     },
     "W": {
       "item": "tfc:fire_bricks"

@@ -1,7 +1,11 @@
 package com.jewey.rosia.common.blocks.custom;
 
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
+import com.jewey.rosia.common.blocks.entity.block_entity.AutoQuernBlockEntity;
 import com.jewey.rosia.common.blocks.entity.block_entity.CanningPressBlockEntity;
+import net.dries007.tfc.common.blocks.ExtendedProperties;
+import net.dries007.tfc.common.blocks.devices.DeviceBlock;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -29,14 +33,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class canning_press extends BaseEntityBlock {
-    public canning_press(Properties pProperties) {
-        super(pProperties);
-        registerDefaultState(getStateDefinition().any().setValue(ON, false));
-    }
+public class canning_press extends DeviceBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty ON = BooleanProperty.create("on");
+
+    public canning_press(ExtendedProperties properties) {
+        super(properties, InventoryRemoveBehavior.DROP);
+        registerDefaultState(getStateDefinition().any().setValue(ON, false));
+    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -108,31 +113,18 @@ public class canning_press extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
-                                 Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide()) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof CanningPressBlockEntity) {
-                NetworkHooks.openGui(((ServerPlayer)pPlayer), (CanningPressBlockEntity)entity, pPos);
-            } else {
-                throw new IllegalStateException("Our Container provider is missing!");
+    @SuppressWarnings("deprecation")
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result)
+    {
+        CanningPressBlockEntity entity = level.getBlockEntity(pos, ModBlockEntities.CANNING_PRESS_BLOCK_ENTITY.get()).orElse(null);
+        if (entity != null)
+        {
+            if (player instanceof ServerPlayer serverPlayer)
+            {
+                Helpers.openScreen(serverPlayer, entity, pos);
             }
+            return InteractionResult.SUCCESS;
         }
-
-        return InteractionResult.sidedSuccess(pLevel.isClientSide());
+        return InteractionResult.PASS;
     }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new CanningPressBlockEntity(pPos, pState);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CANNING_PRESS_BLOCK_ENTITY.get(),
-                CanningPressBlockEntity::tick);
-    }
-
 }

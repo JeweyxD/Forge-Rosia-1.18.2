@@ -43,7 +43,7 @@ public class EnergySyncS2CPacket {
             if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof AutoQuernBlockEntity blockEntity) {
                 blockEntity.setEnergyLevel(energy);
 
-                if(Minecraft.getInstance().player.containerMenu instanceof AutoQuernMenu menu &&
+                if(Minecraft.getInstance().player.containerMenu instanceof AutoQuernContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     blockEntity.setEnergyLevel(energy);
                 }
@@ -67,7 +67,7 @@ public class EnergySyncS2CPacket {
             if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof ExtrudingMachineBlockEntity blockEntity) {
                 blockEntity.setEnergyLevel(energy);
 
-                if(Minecraft.getInstance().player.containerMenu instanceof ExtrudingMachineMenu menu &&
+                if(Minecraft.getInstance().player.containerMenu instanceof ExtrudingMachineContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     blockEntity.setEnergyLevel(energy);
                 }
@@ -75,7 +75,7 @@ public class EnergySyncS2CPacket {
             if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof RollingMachineBlockEntity blockEntity) {
                 blockEntity.setEnergyLevel(energy);
 
-                if(Minecraft.getInstance().player.containerMenu instanceof RollingMachineMenu menu &&
+                if(Minecraft.getInstance().player.containerMenu instanceof RollingMachineContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     blockEntity.setEnergyLevel(energy);
                 }
@@ -107,7 +107,7 @@ public class EnergySyncS2CPacket {
             if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof CanningPressBlockEntity blockEntity) {
                 blockEntity.setEnergyLevel(energy);
 
-                if(Minecraft.getInstance().player.containerMenu instanceof CanningPressMenu menu &&
+                if(Minecraft.getInstance().player.containerMenu instanceof CanningPressContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     blockEntity.setEnergyLevel(energy);
                 }
@@ -115,7 +115,15 @@ public class EnergySyncS2CPacket {
             if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof ElectricLoomBlockEntity blockEntity) {
                 blockEntity.setEnergyLevel(energy);
 
-                if(Minecraft.getInstance().player.containerMenu instanceof ElectricLoomMenu menu &&
+                if(Minecraft.getInstance().player.containerMenu instanceof ElectricLoomContainer menu &&
+                        menu.getBlockEntity().getBlockPos().equals(pos)) {
+                    blockEntity.setEnergyLevel(energy);
+                }
+            }
+            if(Minecraft.getInstance().level.getBlockEntity(pos) instanceof ScrapingMachineBlockEntity blockEntity) {
+                blockEntity.setEnergyLevel(energy);
+
+                if(Minecraft.getInstance().player.containerMenu instanceof ScrapingMachineContainer menu &&
                         menu.getBlockEntity().getBlockPos().equals(pos)) {
                     blockEntity.setEnergyLevel(energy);
                 }

@@ -2,6 +2,7 @@ package com.jewey.rosia.event;
 
 import com.jewey.rosia.common.blocks.ModBlocks;
 import com.jewey.rosia.common.blocks.entity.block_entity.CharcoalKilnBlockEntity;
+import com.jewey.rosia.common.blocks.entity.block_entity.FireBoxBlockEntity;
 import com.jewey.rosia.common.items.DynamicCanFood;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.IFood;
@@ -35,6 +36,14 @@ public class ForgeEventHandler {
         {
             final BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof CharcoalKilnBlockEntity kiln && kiln.light(state, kiln))
+            {
+                event.setCanceled(true);
+            }
+        }
+        else if (block == ModBlocks.FIRE_BOX.get() && event.isStrong())
+        {
+            final BlockEntity entity = level.getBlockEntity(pos);
+            if (entity instanceof FireBoxBlockEntity firebox && firebox.light(state, firebox))
             {
                 event.setCanceled(true);
             }

@@ -31,7 +31,7 @@ public class FluidInfoArea50Height extends InfoArea {
     }
 
     public List<Component> getTooltips() {
-        return List.of(Component.nullToEmpty(fluid.getFluidInTank(0).getAmount()+"/"+fluid.getTankCapacity(0)+" mB"));
+        return List.of(Component.nullToEmpty(fluid.getFluidInTank(0).getAmount()+"/"+fluid.getTankCapacity(0)+" mB of"+fluid.getFluidInTank(0).getFluid()));
     }
 
     @Override

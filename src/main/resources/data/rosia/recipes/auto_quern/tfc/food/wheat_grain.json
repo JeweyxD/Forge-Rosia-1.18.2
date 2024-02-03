@@ -9,8 +9,9 @@
     }
   ],
   "output": {
-    "item": "tfc:food/wheat_flour",
-    "count": 1,
+    "stack": {
+      "item": "tfc:food/wheat_flour"
+    },
     "modifiers": [
       "tfc:copy_food"
     ]

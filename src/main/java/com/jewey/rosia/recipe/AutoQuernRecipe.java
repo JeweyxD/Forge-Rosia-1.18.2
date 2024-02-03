@@ -3,6 +3,7 @@ package com.jewey.rosia.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.jewey.rosia.Rosia;
+import net.dries007.tfc.common.recipes.outputs.ItemStackProvider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class AutoQuernRecipe implements Recipe<SimpleContainer> {
     private final ResourceLocation id;
-    private final ItemStack output;
+    private final ItemStackProvider output;
     private final NonNullList<Ingredient> recipeItems;
 
     @Override
@@ -24,8 +25,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
         return true;
     }
 
-    public AutoQuernRecipe(ResourceLocation id, ItemStack output,
-                                   NonNullList<Ingredient> recipeItems) {
+    public AutoQuernRecipe(ResourceLocation id, ItemStackProvider output, NonNullList<Ingredient> recipeItems) {
         this.id = id;
         this.output = output;
         this.recipeItems = recipeItems;
@@ -43,7 +43,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public ItemStack assemble(SimpleContainer pContainer) {
-        return output;
+        return output.stack().get();
     }
 
     @Override
@@ -53,7 +53,11 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public ItemStack getResultItem() {
-        return output.copy();
+        return output.getEmptyStack();
+    }
+
+    public ItemStackProvider getResult(){
+        return output;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public AutoQuernRecipe fromJson(ResourceLocation id, JsonObject json) {
-            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+            ItemStackProvider output = ItemStackProvider.fromJson(GsonHelper.getAsJsonObject(json, "output"));
 
             JsonArray ingredients = GsonHelper.getAsJsonArray(json, "ingredients");
             NonNullList<Ingredient> inputs = NonNullList.withSize(1, Ingredient.EMPTY);
@@ -102,7 +106,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
             inputs.replaceAll(ignored -> Ingredient.fromNetwork(buf));
 
-            ItemStack output = buf.readItem();
+            ItemStackProvider output = ItemStackProvider.fromNetwork(buf);
             return new AutoQuernRecipe(id, output, inputs);
         }
 

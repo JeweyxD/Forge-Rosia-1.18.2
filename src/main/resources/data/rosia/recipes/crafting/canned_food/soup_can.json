@@ -28,7 +28,7 @@
               "hunger": 4,
               "water": 0,
               "saturation": 0,
-              "decay_modifier": 3.5
+              "decay_modifier": 2.2
             },
             "portions": [
               {

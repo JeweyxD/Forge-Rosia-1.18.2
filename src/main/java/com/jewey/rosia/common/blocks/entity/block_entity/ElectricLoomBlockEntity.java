@@ -2,21 +2,23 @@ package com.jewey.rosia.common.blocks.entity.block_entity;
 
 import com.jewey.rosia.common.blocks.custom.electric_loom;
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
-import com.jewey.rosia.common.blocks.entity.WrappedHandler;
+import com.jewey.rosia.common.container.ElectricLoomContainer;
 import com.jewey.rosia.common.items.ModItems;
 import com.jewey.rosia.networking.ModMessages;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
 import com.jewey.rosia.recipe.ElectricLoomRecipe;
-import com.jewey.rosia.screen.ElectricLoomMenu;
 import com.jewey.rosia.util.ModEnergyStorage;
-import net.dries007.tfc.client.TFCSounds;
+import net.dries007.tfc.common.blockentities.TickableInventoryBlockEntity;
+import net.dries007.tfc.common.capabilities.PartialItemHandler;
+import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.IntArrayBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -26,7 +28,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -35,55 +36,59 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import static com.jewey.rosia.Rosia.MOD_ID;
 
-public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider {
+
+public class ElectricLoomBlockEntity extends TickableInventoryBlockEntity<ItemStackHandler> implements MenuProvider {
+
+    public static final int SLOT_MIN = 0;
+    public static final int SLOT_MAX = 2;
     private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
         }
-
         @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {  //Use for hopper interaction
             return switch (slot) {
                 case 0 -> stack.getItem() == ModItems.STEEL_LOOM_PARTS.get();
-                case 1 -> true;
+                case 1 -> stack.getItem() != ModItems.STEEL_LOOM_PARTS.get();  //Prevent multiple tools being inserted
                 case 2 -> false;
                 default -> super.isItemValid(slot, stack);
             };
         }
     };
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    @Override
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {  //Use for player interaction
+        return switch (slot) {
+            case 0 -> stack.getItem() == ModItems.STEEL_LOOM_PARTS.get();
+            case 1 -> stack.getItem() != ModItems.STEEL_LOOM_PARTS.get();  //Prevent multiple tools being inserted
+            case 2 -> false;
+            default -> super.isItemValid(slot, stack);
+        };
+    }
 
-    private final Map<Direction, LazyOptional<WrappedHandler>> directionWrappedHandlerMap =
-            Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 2, (i, s) -> false)),
-                    Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemHandler, (index) -> index == 1,
-                            (index, stack) -> itemHandler.isItemValid(1, stack))),
-                    Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (index) -> index == 1,
-                            (index, stack) -> itemHandler.isItemValid(1, stack))),
-                    Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 2, (i, s) -> false)),
-                    Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> itemHandler.isItemValid(1, stack))),
-                    Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (index) -> index == 0 || index == 1,
-                            (index, stack) -> itemHandler.isItemValid(0, stack) || itemHandler.isItemValid(1, stack))));
-
-    protected final ContainerData data;
+    @Override
+    public @NotNull Component getDisplayName() {
+        return new TextComponent("Electric Loom");
+    }
+    private static final TranslatableComponent NAME = Helpers.translatable(MOD_ID + ".block_entity.electric_loom");
     private int progress = 0;
     private int maxProgress= 200;
 
+    private final IntArrayBuilder syncableData;
 
-    public ElectricLoomBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.ELECTRIC_LOOM_BLOCK_ENTITY.get(), pPos, pBlockState);
-        this.data = new ContainerData() {
+    public ElectricLoomBlockEntity(BlockPos pos, BlockState state)
+    {
+        super(ModBlockEntities.ELECTRIC_LOOM_BLOCK_ENTITY.get(), pos, state, defaultInventory(3), NAME);
+        syncableData = new IntArrayBuilder() {
             public int get(int index) {
                 return switch (index) {
                     case 0 -> ElectricLoomBlockEntity.this.progress;
@@ -103,47 +108,29 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
                 return 2;
             }
         };
+
+        sidedInventory
+                .on(new PartialItemHandler(inventory).insert(0, 1).extract(2), Direction.Plane.VERTICAL)
+                .on(new PartialItemHandler(inventory).insert(0, 1).extract(2), Direction.Plane.HORIZONTAL);
     }
 
-    @Override
-    public @NotNull Component getDisplayName() {
-        return new TextComponent("Electric Loom");
+    public ContainerData getSyncableData() {
+        return syncableData;
     }
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer)
+    {
         ModMessages.sendToClients(new EnergySyncS2CPacket(this.ENERGY_STORAGE.getEnergyStored(), getBlockPos()));
-        return new ElectricLoomMenu(pContainerId, pPlayerInventory, this, this.data);
+        return ElectricLoomContainer.create(this, pPlayerInventory, pContainerId);
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
         if(cap == CapabilityEnergy.ENERGY) {
             return lazyEnergyHandler.cast();
         }
-
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if(side == null) {
-                return lazyItemHandler.cast();
-            }
-
-            if(directionWrappedHandlerMap.containsKey(side)) {
-                Direction localDir = this.getBlockState().getValue(electric_loom.FACING);
-
-                if(side == Direction.UP || side == Direction.DOWN) {
-                    return directionWrappedHandlerMap.get(side).cast();
-                }
-
-                return switch (localDir) {
-                    default -> directionWrappedHandlerMap.get(side.getOpposite()).cast();
-                    case EAST -> directionWrappedHandlerMap.get(side.getClockWise()).cast();
-                    case SOUTH -> directionWrappedHandlerMap.get(side).cast();
-                    case WEST -> directionWrappedHandlerMap.get(side.getCounterClockWise()).cast();
-                };
-            }
-        }
-
         return super.getCapability(cap, side);
     }
 
@@ -174,31 +161,27 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
     @Override
     public void onLoad() {
         super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> itemHandler);
         lazyEnergyHandler = LazyOptional.of(() -> ENERGY_STORAGE);
     }
 
     @Override
     public void invalidateCaps()  {
         super.invalidateCaps();
-        lazyItemHandler.invalidate();
         lazyEnergyHandler.invalidate();
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        tag.put("inventory", itemHandler.serializeNBT());
+    public void saveAdditional(@NotNull CompoundTag tag) {
         tag.putInt("electric_loom.progress", progress);
         tag.putInt("energy", ENERGY_STORAGE.getEnergyStored());
         super.saveAdditional(tag);
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        itemHandler.deserializeNBT(nbt.getCompound("inventory"));
+    public void loadAdditional(CompoundTag nbt) {
         progress = nbt.getInt("electric_loom.progress");
         ENERGY_STORAGE.setEnergy(nbt.getInt("energy"));
+        super.loadAdditional(nbt);
     }
 
     public void drops() {
@@ -236,9 +219,9 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
 
     private static boolean hasRecipe(ElectricLoomBlockEntity entity) {
         Level level = entity.level;
-        SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
-        for (int i = 0; i < entity.itemHandler.getSlots(); i++) {
-            inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(entity.inventory.getSlots());
+        for (int i = 0; i < entity.inventory.getSlots(); i++) {
+            inventory.setItem(i, entity.inventory.getStackInSlot(i));
         }
 
         Optional<ElectricLoomRecipe> match = level.getRecipeManager()
@@ -247,25 +230,24 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
         boolean hasCount = false;
         if (match.isPresent()) {
             int count = match.get().getInputCount();
-            hasCount = entity.itemHandler.getStackInSlot(1).getCount() >= count;
+            hasCount = entity.inventory.getStackInSlot(1).getCount() >= count;
         }
 
-
-        return match.isPresent() && canInsertAmountIntoOutputSlot(inventory)
+        return match.isPresent() && canInsertAmountIntoOutputSlot(inventory, match.get().getResultItem().getCount())
                 && canInsertItemIntoOutputSlot(inventory, match.get().getResultItem())
                 && hasToolsInToolSlot(entity) && hasCount;
     }
 
 
     private static boolean hasToolsInToolSlot(ElectricLoomBlockEntity entity) {
-        return entity.itemHandler.getStackInSlot(0).getItem() == ModItems.STEEL_LOOM_PARTS.get();
+        return entity.inventory.getStackInSlot(0).getItem() == ModItems.STEEL_LOOM_PARTS.get();
     }
 
     private static void craftItem(ElectricLoomBlockEntity entity) {
         Level level = entity.level;
-        SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
-        for (int i = 0; i < entity.itemHandler.getSlots(); i++) {
-            inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(entity.inventory.getSlots());
+        for (int i = 0; i < entity.inventory.getSlots(); i++) {
+            inventory.setItem(i, entity.inventory.getStackInSlot(i));
         }
 
         Optional<ElectricLoomRecipe> match = level.getRecipeManager()
@@ -273,13 +255,13 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
 
 
         if(match.isPresent()) {
-            if(entity.itemHandler.getStackInSlot(0).hurt(1, new Random(), null)) {
-                entity.itemHandler.extractItem(0,1, false);
+            if(entity.inventory.getStackInSlot(0).hurt(1, new Random(), null)) {
+                entity.inventory.extractItem(0,1, false);
             }
-            entity.itemHandler.extractItem(1, match.get().getInputCount(), false);
+            entity.inventory.extractItem(1, match.get().getInputCount(), false);
 
-            entity.itemHandler.setStackInSlot(2, new ItemStack(match.get().getResultItem().getItem(),
-                    entity.itemHandler.getStackInSlot(2).getCount() + match.get().getResultItem().getCount()));
+            entity.inventory.setStackInSlot(2, new ItemStack(match.get().getResultItem().getItem(),
+                    entity.inventory.getStackInSlot(2).getCount() + match.get().getResultItem().getCount()));
 
             entity.resetProgress();
         }
@@ -293,7 +275,7 @@ public class ElectricLoomBlockEntity extends BlockEntity implements MenuProvider
         return inventory.getItem(2).getItem() == output.getItem() || inventory.getItem(2).isEmpty();
     }
 
-    private static boolean canInsertAmountIntoOutputSlot(SimpleContainer inventory) {
-        return inventory.getItem(2).getMaxStackSize() > inventory.getItem(2).getCount();
+    private static boolean canInsertAmountIntoOutputSlot(SimpleContainer inventory, int output) {
+        return inventory.getItem(2).getMaxStackSize() >= inventory.getItem(2).getCount() + output; //Stack overflow/loss
     }
 }

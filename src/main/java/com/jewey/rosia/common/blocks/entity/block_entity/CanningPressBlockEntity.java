@@ -1,23 +1,25 @@
 package com.jewey.rosia.common.blocks.entity.block_entity;
 
 import com.jewey.rosia.common.blocks.custom.canning_press;
-import com.jewey.rosia.common.blocks.custom.electric_lantern;
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
-import com.jewey.rosia.common.blocks.entity.WrappedHandler;
 import com.jewey.rosia.common.blocks.entity.WrappedHandlerEnergy;
 import com.jewey.rosia.common.capabilities.food.RosiaFoodTraits;
+import com.jewey.rosia.common.container.CanningPressContainer;
 import com.jewey.rosia.networking.ModMessages;
 import com.jewey.rosia.networking.packet.EnergySyncS2CPacket;
-import com.jewey.rosia.networking.packet.ItemStackSyncS2CPacket;
-import com.jewey.rosia.screen.CanningPressMenu;
 import com.jewey.rosia.util.ModEnergyStorage;
 import com.jewey.rosia.util.RosiaTags;
+import net.dries007.tfc.common.blockentities.TickableInventoryBlockEntity;
+import net.dries007.tfc.common.capabilities.PartialItemHandler;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
+import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.util.IntArrayBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,33 +32,33 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static com.jewey.rosia.Rosia.MOD_ID;
 
-public class CanningPressBlockEntity extends BlockEntity implements MenuProvider {
+
+public class CanningPressBlockEntity extends TickableInventoryBlockEntity<ItemStackHandler> implements MenuProvider {
+
+    public static final int SLOT_MIN = 0;
+    public static final int SLOT_MAX = 1;
+
     private final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
-            if(!level.isClientSide()) {
-                ModMessages.sendToClients(new ItemStackSyncS2CPacket(this, worldPosition));
-            }
         }
 
         @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {  //Use for hopper interaction
             return switch (slot) {
                 case 0 -> stack.is(RosiaTags.Items.DYNAMIC_CAN);
                 case 1 -> false;
@@ -65,35 +67,28 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
         }
     };
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    @Override
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {  //Use for player interaction
+        return switch (slot) {
+            case 0 -> stack.is(RosiaTags.Items.DYNAMIC_CAN);
+            case 1 -> false;
+            default -> super.isItemValid(slot, stack);
+        };
+    }
 
-    private final Map<Direction, LazyOptional<WrappedHandler>> directionWrappedHandlerMap =
-            Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> false)),
-
-                    Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 0,
-                            (index, stack) -> itemHandler.isItemValid(0, stack))),
-
-                    Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> itemHandler.isItemValid(0, stack))),
-
-                    Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> itemHandler.isItemValid(0, stack))),
-
-                    Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> itemHandler.isItemValid(0, stack))),
-
-                    Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i) -> i == 1,
-                            (index, stack) -> itemHandler.isItemValid(0, stack))));
-
-    protected final ContainerData data;
+    @Override
+    public @NotNull Component getDisplayName() {
+        return new TextComponent("Canning Press");
+    }
+    private static final TranslatableComponent NAME = Helpers.translatable(MOD_ID + ".block_entity.canning_press");
     private int progress = 0;
     private int maxProgress= 50;
 
+    private final IntArrayBuilder syncableData;
 
-    public CanningPressBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.CANNING_PRESS_BLOCK_ENTITY.get(), pPos, pBlockState);
-        this.data = new ContainerData() {
+    public CanningPressBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.CANNING_PRESS_BLOCK_ENTITY.get(), pos, state, defaultInventory(3), NAME);
+        syncableData = new IntArrayBuilder() {
             public int get(int index) {
                 return switch (index) {
                     case 0 -> CanningPressBlockEntity.this.progress;
@@ -113,64 +108,29 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
                 return 2;
             }
         };
+
+        sidedInventory
+                .on(new PartialItemHandler(inventory).insert(0).extract(1), Direction.DOWN)
+                .on(new PartialItemHandler(inventory).insert(0).extract(1), Direction.NORTH);
     }
 
-    @Override
-    public @NotNull Component getDisplayName() {
-        return new TextComponent("Canning Press");
+    public ContainerData getSyncableData() {
+        return syncableData;
     }
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer)
+    {
         ModMessages.sendToClients(new EnergySyncS2CPacket(this.ENERGY_STORAGE.getEnergyStored(), getBlockPos()));
-        return new CanningPressMenu(pContainerId, pPlayerInventory, this, this.data);
+        return CanningPressContainer.create(this, pPlayerInventory, pContainerId);
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @org.jetbrains.annotations.Nullable Direction side) {
         if(cap == CapabilityEnergy.ENERGY) {
-            if(side == null) {
-                return lazyEnergyHandler.cast();
-            }
-
-            if(directionWrappedHandlerMapEnergy.containsKey(side)) {
-                Direction localDir = this.getBlockState().getValue(electric_lantern.FACING);
-
-                if(side == Direction.UP || side == Direction.DOWN) {
-                    return directionWrappedHandlerMapEnergy.get(side).cast();
-                }
-
-                return switch (localDir) {
-                    default -> directionWrappedHandlerMapEnergy.get(side.getOpposite()).cast();
-                    case EAST -> directionWrappedHandlerMapEnergy.get(side.getClockWise()).cast();
-                    case SOUTH -> directionWrappedHandlerMapEnergy.get(side).cast();
-                    case WEST -> directionWrappedHandlerMapEnergy.get(side.getCounterClockWise()).cast();
-                };
-            }
+            return lazyEnergyHandler.cast();
         }
-
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if(side == null) {
-                return lazyItemHandler.cast();
-            }
-
-            if(directionWrappedHandlerMap.containsKey(side)) {
-                Direction localDir = this.getBlockState().getValue(canning_press.FACING);
-
-                if(side == Direction.UP || side == Direction.DOWN) {
-                    return directionWrappedHandlerMap.get(side).cast();
-                }
-
-                return switch (localDir) {
-                    default -> directionWrappedHandlerMap.get(side.getOpposite()).cast();
-                    case EAST -> directionWrappedHandlerMap.get(side.getClockWise()).cast();
-                    case SOUTH -> directionWrappedHandlerMap.get(side).cast();
-                    case WEST -> directionWrappedHandlerMap.get(side.getCounterClockWise()).cast();
-                };
-            }
-        }
-
         return super.getCapability(cap, side);
     }
 
@@ -186,7 +146,7 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
     private static final int ENERGY_REQ = 10; // Energy cost to craft item
 
     private final Map<Direction, LazyOptional<WrappedHandlerEnergy>> directionWrappedHandlerMapEnergy =
-            //Handler for sided energy: extract, receive, canExtract, canReceive
+            //Handler for sided energy: extract, receive, canExtract, canReceive (seems redundant, but it breaks otherwise because why not)
             //Determines what sides can perform actions
             Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandlerEnergy(ENERGY_STORAGE, (i) -> true, (i) -> true, true, true)),
                     Direction.UP, LazyOptional.of(() -> new WrappedHandlerEnergy(ENERGY_STORAGE,(i) -> false, (i) -> false, false, false)),
@@ -211,31 +171,27 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
     @Override
     public void onLoad() {
         super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> itemHandler);
         lazyEnergyHandler = LazyOptional.of(() -> ENERGY_STORAGE);
     }
 
     @Override
     public void invalidateCaps()  {
         super.invalidateCaps();
-        lazyItemHandler.invalidate();
         lazyEnergyHandler.invalidate();
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        tag.put("inventory", itemHandler.serializeNBT());
+    public void saveAdditional(@NotNull CompoundTag tag) {
         tag.putInt("canning_press.progress", progress);
         tag.putInt("energy", ENERGY_STORAGE.getEnergyStored());
         super.saveAdditional(tag);
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        itemHandler.deserializeNBT(nbt.getCompound("inventory"));
+    public void loadAdditional(CompoundTag nbt) {
         progress = nbt.getInt("canning_press.progress");
         ENERGY_STORAGE.setEnergy(nbt.getInt("energy"));
+        super.loadAdditional(nbt);
     }
 
     public void drops() {
@@ -247,8 +203,8 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
         Containers.dropContents(this.level, this.worldPosition, inventory);
     }
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, CanningPressBlockEntity pBlockEntity) {
-        if(!pBlockEntity.itemHandler.getStackInSlot(0).isEmpty() && hasEnoughEnergy(pBlockEntity) && canOutput(pBlockEntity)) {
+    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CanningPressBlockEntity pBlockEntity) {
+        if(!pBlockEntity.inventory.getStackInSlot(0).isEmpty() && hasEnoughEnergy(pBlockEntity) && canOutput(pBlockEntity)) {
             pBlockEntity.progress++;
             pLevel.setBlock(pPos, pState.setValue(canning_press.ON, true), 3);
             setChanged(pLevel, pPos, pState);
@@ -277,14 +233,14 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
     }
 
     private static void craftItem(CanningPressBlockEntity entity) {
-        ItemStack inputStack = entity.itemHandler.getStackInSlot(0).copy();  // Keep as an itemStack to avoid losing nutrient/nbt data
-        inputStack.setCount(entity.itemHandler.getStackInSlot(1).getCount() + 1);
-        entity.itemHandler.setStackInSlot(1, inputStack);
+        ItemStack inputStack = entity.inventory.getStackInSlot(0).copy();  // Keep as an itemStack to avoid losing nutrient/nbt data
+        inputStack.setCount(entity.inventory.getStackInSlot(1).getCount() + 1);
+        entity.inventory.setStackInSlot(1, inputStack);
 
-        ItemStack outputStack = entity.itemHandler.getStackInSlot(1);
-        FoodCapability.applyTrait(outputStack, RosiaFoodTraits.CANNED);
+        ItemStack outputStack = entity.inventory.getStackInSlot(1);
+        FoodCapability.applyTrait(outputStack, RosiaFoodTraits.SEALED);
 
-        entity.itemHandler.extractItem(0,1, false);
+        entity.inventory.extractItem(0,1, false);
 
         entity.resetProgress();
     }
@@ -293,25 +249,20 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
         this.progress = 0;
     }
 
-    private static boolean canInsertItemIntoOutputSlot(SimpleContainer inventory) {
-        return inventory.getItem(1).getItem() == inventory.getItem(0).getItem() || inventory.getItem(1).isEmpty();
-    }
-
-    private static boolean canInsertAmountIntoOutputSlot(SimpleContainer inventory) {
-        return inventory.getItem(1).getMaxStackSize() > inventory.getItem(1).getCount();
-    }
-
     private static boolean canOutput(CanningPressBlockEntity entity) {
-        SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
-        return canInsertAmountIntoOutputSlot(inventory) && canInsertItemIntoOutputSlot(inventory);
+        ItemStackHandler inventory = entity.inventory;
+        boolean canInsertAmountIntoOutputSlot = inventory.getStackInSlot(1).getMaxStackSize() > inventory.getStackInSlot(1).getCount();
+        boolean canInsertItemIntoOutputSlot = inventory.getStackInSlot(0).getItem() == inventory.getStackInSlot(1).getItem()
+                || inventory.getStackInSlot(1).isEmpty();
+        return canInsertAmountIntoOutputSlot && canInsertItemIntoOutputSlot;
     }
 
     public ItemStack getRenderStack() {
         ItemStack stack;
-        if(!itemHandler.getStackInSlot(0).isEmpty()) {
-            stack = itemHandler.getStackInSlot(0);
+        if(!inventory.getStackInSlot(0).isEmpty()) {
+            stack = inventory.getStackInSlot(0);
         } else {
-            stack = itemHandler.getStackInSlot(1);
+            stack = inventory.getStackInSlot(1);
         }
 
         return stack;
@@ -319,7 +270,7 @@ public class CanningPressBlockEntity extends BlockEntity implements MenuProvider
 
     public void setHandler(ItemStackHandler itemStackHandler) {
         for (int i = 0; i < itemStackHandler.getSlots(); i++) {
-            itemHandler.setStackInSlot(i, itemStackHandler.getStackInSlot(i));
+            inventory.setStackInSlot(i, itemStackHandler.getStackInSlot(i));
         }
     }
 }

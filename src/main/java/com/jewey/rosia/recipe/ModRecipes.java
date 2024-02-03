@@ -23,6 +23,14 @@ public class ModRecipes {
     public static final RegistryObject<RecipeSerializer<ElectricLoomRecipe>> ELECTRIC_LOOM_SERIALIZER =
             SERIALIZERS.register("electric_loom", () ->ElectricLoomRecipe.Serializer.INSTANCE);
 
+    public static final RegistryObject<RecipeSerializer<ScrapingMachineRecipe>> SCRAPING_MACHINE_SERIALIZER =
+            SERIALIZERS.register("scraping_machine", () ->ScrapingMachineRecipe.Serializer.INSTANCE);
+
+    public static final RegistryObject<RecipeSerializer<BoilingCauldronRecipe>> BOILING_CAULDRON_SERIALIZER =
+            SERIALIZERS.register("boiling_cauldron", () ->BoilingCauldronRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<LavaBasinRecipe>> LAVA_BASIN_SERIALIZER =
+            SERIALIZERS.register("lava_basin", () ->LavaBasinRecipe.Serializer.INSTANCE);
+
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

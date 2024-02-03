@@ -42,6 +42,16 @@
       "type": "patchouli:spotlight",
       "item": "rosia:steel_loom_parts",
       "text": "The $(thing)Steel Loom Parts$() are components used within the $(thing)Electric Loom$(). Made on the anvil."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "rosia:crafting/blocks/scraping_machine",
+      "text": "The $(thing)Scraping Machine$() is a machine used to automatically scrape items such as leather and paper."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "tfc:metal/knife/wrought_iron",
+      "text": "$(thing)Knives$() are used within the $(thing)Scraping Machine$()."
     }
   ],
   "read_by_default": true,

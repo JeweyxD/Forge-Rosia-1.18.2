@@ -9,8 +9,9 @@
     }
   ],
   "output": {
-    "item": "tfc:food/rye_flour",
-    "count": 1,
+    "stack": {
+      "item": "tfc:food/rye_flour"
+    },
     "modifiers": [
       "tfc:copy_food"
     ]

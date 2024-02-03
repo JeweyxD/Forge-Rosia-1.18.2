@@ -1,7 +1,11 @@
 package com.jewey.rosia.common.blocks.custom;
 
 import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
+import com.jewey.rosia.common.blocks.entity.block_entity.AutoQuernBlockEntity;
 import com.jewey.rosia.common.blocks.entity.block_entity.NickelIronBatteryBlockEntity;
+import net.dries007.tfc.common.blocks.ExtendedProperties;
+import net.dries007.tfc.common.blocks.devices.DeviceBlock;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -29,21 +33,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class nickel_iron_battery extends BaseEntityBlock {
-    public nickel_iron_battery(Properties pProperties) {
-        super(pProperties);
-    }
+public class nickel_iron_battery extends DeviceBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+
+    public nickel_iron_battery(ExtendedProperties properties) {
+        super(properties, InventoryRemoveBehavior.DROP);
+    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
     }
 
     @Override
@@ -58,31 +58,19 @@ public class nickel_iron_battery extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
-                                 Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide()) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof NickelIronBatteryBlockEntity) {
-                NetworkHooks.openGui(((ServerPlayer)pPlayer), (NickelIronBatteryBlockEntity)entity, pPos);
-            } else {
-                throw new IllegalStateException("Our Container provider is missing!");
+    @SuppressWarnings("deprecation")
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result)
+    {
+        NickelIronBatteryBlockEntity entity = level.getBlockEntity(pos, ModBlockEntities.NICKEL_IRON_BATTERY_BLOCK_ENTITY.get()).orElse(null);
+        if (entity != null)
+        {
+            if (player instanceof ServerPlayer serverPlayer)
+            {
+                Helpers.openScreen(serverPlayer, entity, pos);
             }
+            return InteractionResult.SUCCESS;
         }
-
-        return InteractionResult.sidedSuccess(pLevel.isClientSide());
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new NickelIronBatteryBlockEntity(pPos, pState);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.NICKEL_IRON_BATTERY_BLOCK_ENTITY.get(),
-                NickelIronBatteryBlockEntity::tick);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -91,6 +79,7 @@ public class nickel_iron_battery extends BaseEntityBlock {
         super.appendHoverText(pStack, pLevel, components, pFlag);
     }
 
+    //For comparator output
     public boolean hasAnalogOutputSignal(BlockState pState) {
         return true;
     }

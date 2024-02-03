@@ -24,6 +24,18 @@
     {
       "type": "patchouli:text",
       "text": "$(thing)Purple Steel$() is a very sturdy metal, and as such, cannot be easily manipulated. Sheets, rods, and wires are only obtainable through the strength of machines. All other processes are completed on a $(l:mechanics/anvils)Tier VI Anvil$()."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "rosia:purple_steel_pickaxe",
+      "title": "Purple Steel Armaments",
+      "link_recipes": false,
+      "text": "$(thing)Purple Steel$() worked into tools, weapons, and armor create items with high durability, efficiency, damage, and protection."
+    },
+    {
+      "type": "tfc:anvil_recipe",
+      "recipe": "rosia:anvil/bucket",
+      "text": "Additionally, $(thing)Purple Steel$() can be forged into one of the most sought after items in the game... a $(thing)Bucket$()."
     }
   ],
   "read_by_default": true,

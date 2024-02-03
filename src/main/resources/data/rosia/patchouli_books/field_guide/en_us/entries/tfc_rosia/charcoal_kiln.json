@@ -5,12 +5,12 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "The $(thing)Charcoal Kiln$() is a device used to produce charcoal. Charcoal kilns are multi-block structures.$(br2)Creating charcoal in a kiln is faster and more efficient with a $(thing)90%$() yield on charcoal and taking only $(thing)75%$() the normal time.$(br2)Default time is 13.5 hours."
+      "text": "The $(thing)Charcoal Kiln$() is a device used to produce charcoal. Charcoal kilns are multi-block structures.$(br2)Creating charcoal in a kiln is faster and more efficient with a $(thing)75%$() yield on charcoal and taking only $(thing)75%$() the normal time.$(br2)Default time is 13.5 hours."
     },
     {
       "type": "patchouli:crafting",
       "recipe": "rosia:crafting/blocks/charcoal_kiln",
-      "text": "The $(thing)Charcoal Kiln$() is made using fired clay bricks."
+      "text": "The $(thing)Charcoal Kiln$() is made using fired clay bricks and a bronze double sheet."
     },
     {
       "type": "patchouli:text",

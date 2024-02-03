@@ -4,6 +4,7 @@ import com.jewey.rosia.common.blocks.entity.ModBlockEntities;
 import com.jewey.rosia.common.blocks.entity.block_entity.SteamGeneratorBlockEntity;
 import net.dries007.tfc.common.blocks.ExtendedProperties;
 import net.dries007.tfc.common.blocks.devices.DeviceBlock;
+import net.dries007.tfc.common.fluids.FluidHelpers;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -106,7 +107,14 @@ public class steam_generator extends DeviceBlock {
         SteamGeneratorBlockEntity forge = level.getBlockEntity(pos, ModBlockEntities.STEAM_GENERATOR_BLOCK_ENTITY.get()).orElse(null);
         if (forge != null)
         {
-            if (player instanceof ServerPlayer serverPlayer)
+            //Bucket/fluid-inventory interaction i.e. place fluid from hand into device
+            final ItemStack stack = player.getItemInHand(hand);
+            if (FluidHelpers.transferBetweenBlockEntityAndItem(stack, forge, player, hand))
+            {
+            return InteractionResult.SUCCESS;
+            }
+
+            else if (player instanceof ServerPlayer serverPlayer)
             {
                 Helpers.openScreen(serverPlayer, forge, pos);
             }

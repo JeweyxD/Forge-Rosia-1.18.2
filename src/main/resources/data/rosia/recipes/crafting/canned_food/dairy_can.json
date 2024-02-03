@@ -28,19 +28,9 @@
             "hunger": 4,
             "water": 0.5,
             "saturation": 1,
-            "decay_modifier": 4.5
+            "decay_modifier": 0.3
           },
           "portions": [
-            {
-              "nutrient_modifier": 0.7,
-              "water_modifier": 0.7,
-              "saturation_modifier": 0.7
-            },
-            {
-              "nutrient_modifier": 0.7,
-              "water_modifier": 0.7,
-              "saturation_modifier": 0.7
-            },
             {
               "nutrient_modifier": 0.7,
               "water_modifier": 0.7,

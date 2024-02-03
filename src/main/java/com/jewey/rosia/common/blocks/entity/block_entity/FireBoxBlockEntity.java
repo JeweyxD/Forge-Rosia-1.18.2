@@ -48,6 +48,15 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
         protected void onContentsChanged(int slot) {
             setChanged();
         }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            return switch (slot) {
+                case 0, 1, 2 -> stack.is(RosiaTags.Items.FIRE_BOX_FUEL);
+                case 3 -> stack.getItem() == TFCItems.POWDERS.get(Powder.WOOD_ASH).get();
+                default -> super.isItemValid(slot, stack);
+            };
+        }
     };
 
     @Override
@@ -72,14 +81,14 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
     private static final TranslatableComponent NAME = Helpers.translatable(MOD_ID + ".block_entity.fire_box");
 
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, FireBoxBlockEntity forge)
+    public static void serverTick(Level level, BlockPos pos, BlockState state, FireBoxBlockEntity entity)
     {
-        forge.checkForLastTickSync();
-        forge.checkForCalendarUpdate();
+        entity.checkForLastTickSync();
+        entity.checkForCalendarUpdate();
 
-        if (forge.needsRecipeUpdate)
+        if (entity.needsRecipeUpdate)
         {
-            forge.needsRecipeUpdate = false;
+            entity.needsRecipeUpdate = false;
         }
 
         boolean isRaining = level.isRainingAt(pos);
@@ -92,78 +101,73 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
             }
 
             // Create wood ash when wooden fuel is done burning
-            if(forge.burnTicks <= 3 && forge.ash) {   // burnTicks must be an odd number more than 1 due to bellows/rain ticking down at 2 -> an even number
-                forge.inventory.setStackInSlot(OUTPUT_SLOT, new ItemStack(TFCItems.POWDERS.get(Powder.WOOD_ASH).get(),
-                        forge.inventory.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
-                forge.ash = false;
+            if(entity.burnTicks <= 3 && entity.ash) {   // burnTicks must be an odd number more than 1 due to bellows/rain ticking down at 2, an even number
+                entity.inventory.setStackInSlot(OUTPUT_SLOT, new ItemStack(TFCItems.POWDERS.get(Powder.WOOD_ASH).get(),
+                        entity.inventory.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
+                entity.ash = false;
             }
 
             // Update fuel
-            if (forge.burnTicks < 0) {
-                forge.burnTicks = 1;
+            if (entity.burnTicks < 0) {
+                entity.burnTicks = 1;
             }
-            if (forge.burnTicks > 0)
+            if (entity.burnTicks > 0)
             {
-                forge.burnTicks -= forge.airTicks > 0 || isRaining ? 2 : 1; // Fuel burns twice as fast using bellows, or in the rain
+                entity.burnTicks -= entity.airTicks > 0 || isRaining ? 2 : 1; // Fuel burns twice as fast using bellows, or in the rain
             }
-            if (forge.burnTicks == 0 && forge.burnTemperature == 0 && forge.temperature == 0 && !forge.consumeFuel())
+            if (entity.burnTicks == 0 && entity.burnTemperature == 0 && entity.temperature == 0 && !entity.consumeFuel())
             {
-                forge.extinguish();
+                entity.extinguish();
                 level.setBlockAndUpdate(pos, state.setValue(fire_box.HEAT, 0));
-                forge.markForSync();
+                entity.markForSync();
             }
             // No fuel -> extinguish
-            if (forge.burnTemperature > 0 && forge.burnTicks <= 0 && !forge.consumeFuel())
+            if (entity.burnTemperature > 0 && entity.burnTicks <= 0 && !entity.consumeFuel())
             {
-                forge.extinguish();
+                entity.extinguish();
             }
         }
-        else if (forge.burnTemperature > 0)
+        else if (entity.burnTemperature > 0)
         {
-            forge.extinguish();
+            entity.extinguish();
         }
-        if (forge.airTicks > 0)
+        if (entity.airTicks > 0)
         {
-            forge.airTicks--;
+            entity.airTicks--;
         }
 
-        // Always update temperature until the forge is not hot anymore
-        if (forge.temperature > 0 || forge.burnTemperature > 0)
+        // Always update temperature until the entity is not hot anymore
+        if (entity.temperature > 0 || entity.burnTemperature > 0)
         {
-            forge.temperature = HeatCapability.adjustDeviceTemp(forge.temperature, forge.burnTemperature, forge.airTicks, isRaining);
+            entity.temperature = HeatCapability.adjustDeviceTemp(entity.temperature, entity.burnTemperature, entity.airTicks, isRaining);
 
-            HeatCapability.provideHeatTo(level, pos.above(), forge.temperature);
+            HeatCapability.provideHeatTo(level, pos.above(), entity.temperature);
 
-            forge.markForSync();
+            entity.markForSync();
         }
 
         // Update heat level
-        if (state.getValue(fire_box.HEAT) > 0 && forge.temperature > 0)
+        if (state.getValue(fire_box.HEAT) > 0 && entity.temperature > 0)
         {
-            int heatLevel = Mth.clamp((int) (forge.temperature / Heat.maxVisibleTemperature() * 6) + 1, 1, 7); // scaled 1 through 7
+            int heatLevel = Mth.clamp((int) (entity.temperature / Heat.maxVisibleTemperature() * 6) + 1, 1, 7); // scaled 1 through 7
             if (heatLevel != state.getValue(fire_box.HEAT))
             {
                 level.setBlockAndUpdate(pos, state.setValue(fire_box.HEAT, heatLevel));
-                forge.markForSync();
+                entity.markForSync();
             }
         }
 
-        // Light the forge automatically
-        final ItemStack fuelStack = forge.inventory.getStackInSlot(SLOT_FUEL_MIN);
-        if (state.getValue(fire_box.HEAT) == 0 && !fuelStack.isEmpty() && forge.burnTemperature == 0) {
-            level.setBlock(pos, state.setValue(fire_box.HEAT, 1), Block.UPDATE_ALL);
-            forge.markForSync();
-        }
-        // Re-light the forge if empty and new fuel is added
-        if (state.getValue(fire_box.HEAT) != 0 && !fuelStack.isEmpty() && forge.burnTemperature == 0 && !forge.consumeFuel()) {
-            forge.consumeFuel();
-            forge.markForSync();
+        // Re-light the firebox if empty and new fuel is added
+        final ItemStack fuelStack = entity.inventory.getStackInSlot(SLOT_FUEL_MIN);
+        if (state.getValue(fire_box.HEAT) != 0 && !fuelStack.isEmpty() && entity.burnTemperature == 0 && !entity.consumeFuel()) {
+            entity.consumeFuel();
+            entity.markForSync();
         }
 
         // This is here to avoid duplication glitches
-        if (forge.needsSlotUpdate)
+        if (entity.needsSlotUpdate)
         {
-            forge.cascadeFuelSlots();
+            entity.cascadeFuelSlots();
         }
     }
 
@@ -174,7 +178,7 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
     private float initBurnTicks; // Initial read of the burn ticks of consumed fuel
     private float burnTemperature; // Temperature provided from the current item of fuel
     private int airTicks; // Ticks of air provided by bellows
-    private long lastPlayerTick; // Last player tick this forge was ticked (for purposes of catching up)
+    private long lastPlayerTick; // Last player tick this firebox was ticked (for purposes of catching up)
     private boolean needsRecipeUpdate; // Set to indicate on tick, the cached recipes need to be re-updated
     private boolean ash; // Whether ash is created or not
 
@@ -319,6 +323,18 @@ public class FireBoxBlockEntity extends TickableInventoryBlockEntity<ItemStackHa
             case 0, 1, 2 -> 4;
             default -> 64;
         };
+    }
+
+    public boolean light(BlockState state, FireBoxBlockEntity firebox)
+    {
+        // Light the firebox
+        final ItemStack fuelStack = firebox.inventory.getStackInSlot(SLOT_FUEL_MIN);
+        if (state.getValue(fire_box.HEAT) == 0 && !fuelStack.isEmpty() && firebox.burnTemperature == 0) {
+            level.setBlock(worldPosition, state.setValue(fire_box.HEAT, 1), Block.UPDATE_ALL);
+            firebox.markForSync();
+            return true;
+        }
+        return false;
     }
 
 

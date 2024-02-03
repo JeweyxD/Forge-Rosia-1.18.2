@@ -6,6 +6,7 @@ import net.dries007.tfc.common.TFCTags;
 import net.dries007.tfc.common.capabilities.food.Nutrient;
 import net.dries007.tfc.common.items.*;
 import net.dries007.tfc.util.Helpers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
@@ -84,9 +85,6 @@ public class ModItems {
     public static final RegistryObject<Item> TOOL_BELT = register("tool_belt",
             () -> new ToolBeltItem(properties().stacksTo(1)));
 
-    public static final RegistryObject<Item> PURPLE_STEEL_RIFLE = register("purple_steel_rifle",
-            () -> new RifleItem(properties().durability(2000)));
-
     public static final RegistryObject<Item> BULLET = register("bullets");
 
     public static final RegistryObject<Item> RIFLE_AMMO = register("rifle_ammo",
@@ -94,6 +92,16 @@ public class ModItems {
 
 
     //TOOLS & TOOL HEADS
+    public static final RegistryObject<Item> PURPLE_STEEL_RIFLE = register("purple_steel_rifle",
+            () -> new RifleItem(properties().durability(2500)));
+
+    public static final RegistryObject<Item> PURPLE_STEEL_TUYERE = register("purple_steel_tuyere",
+            () -> new TieredItem(ModTiers.PURPLE_STEEL, properties()));
+
+    public static final RegistryObject<Item> PURPLE_STEEL_FISH_HOOK = register("purple_steel_fish_hook");
+    public static final RegistryObject<Item> PURPLE_STEEL_FISHING_ROD = register("purple_steel_fishing_rod",
+            () -> new TFCFishingRodItem(properties().durability(7500), ModTiers.PURPLE_STEEL));
+
     public static final RegistryObject<Item> PURPLE_STEEL_PICKAXE = register("purple_steel_pickaxe",
             () -> new PickaxeItem(ModTiers.PURPLE_STEEL, -3,-2.8F, properties()));
     public static final RegistryObject<Item> PURPLE_STEEL_PICKAXE_HEAD = register("purple_steel_pickaxe_head");
@@ -122,6 +130,11 @@ public class ModItems {
     public static final RegistryObject<Item> PURPLE_STEEL_SAW = register("purple_steel_saw",
             () -> new AxeItem(ModTiers.PURPLE_STEEL, -5.5F,-3F, properties()));
     public static final RegistryObject<Item> PURPLE_STEEL_SAW_BLADE = register("purple_steel_saw_blade");
+
+    public static final RegistryObject<Item> PURPLE_STEEL_JAVELIN = register("purple_steel_javelin",
+            () -> new JavelinItem(ModTiers.PURPLE_STEEL, 0, -2.2F, properties(),
+                    new ResourceLocation("rosia", "textures/entity/projectiles/purple_steel_javelin_projectile.png")));
+    public static final RegistryObject<Item> PURPLE_STEEL_JAVELIN_HEAD = register("purple_steel_javelin_head");
 
     public static final RegistryObject<Item> PURPLE_STEEL_SWORD = register("purple_steel_sword",
             () -> new SwordItem(ModTiers.PURPLE_STEEL, 0,-2.4F, properties()));
@@ -164,6 +177,13 @@ public class ModItems {
 
     public static final RegistryObject<Item> PURPLE_STEEL_BOOTS = register("purple_steel_boots",
             () -> new ArmorItem(ModArmorMaterials.PURPLE_STEEL, EquipmentSlot.FEET, properties()));
+
+    public static final RegistryObject<Item> PURPLE_STEEL_HORSE_ARMOR = register("purple_steel_horse_armor",
+            () -> new HorseArmorItem(14, new ResourceLocation("rosia",
+                    "textures/entity/animal/horse_armor/purple_steel_horse_armor_entity.png"), properties()));
+
+    public static final RegistryObject<Item> PURPLE_STEEL_SHIELD = register("purple_steel_shield",
+            () -> new TFCShieldItem(ModTiers.PURPLE_STEEL, properties()));
 
 
     // CANNED FOOD
