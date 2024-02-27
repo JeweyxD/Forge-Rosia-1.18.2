@@ -1,5 +1,10 @@
 {
   "type": "rosia:lava_basin",
+  "ingredients": [
+    {
+      "item": "minecraft:dirt"
+    }
+  ],
   "output": {
     "item": "tfc:rock/loose/rhyolite",
     "count": 1

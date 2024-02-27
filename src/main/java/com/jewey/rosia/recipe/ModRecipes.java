@@ -28,6 +28,7 @@ public class ModRecipes {
 
     public static final RegistryObject<RecipeSerializer<BoilingCauldronRecipe>> BOILING_CAULDRON_SERIALIZER =
             SERIALIZERS.register("boiling_cauldron", () ->BoilingCauldronRecipe.Serializer.INSTANCE);
+
     public static final RegistryObject<RecipeSerializer<LavaBasinRecipe>> LAVA_BASIN_SERIALIZER =
             SERIALIZERS.register("lava_basin", () ->LavaBasinRecipe.Serializer.INSTANCE);
 

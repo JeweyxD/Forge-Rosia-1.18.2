@@ -265,7 +265,7 @@ public class AutoQuernBlockEntity extends TickableInventoryBlockEntity<ItemStack
             }
             entity.inventory.extractItem(1,1, false);
 
-            ItemStack outputStack = match.get().getResult().getStack(inventory.getItem(1));
+            ItemStack outputStack = match.get().getResultItem();
             outputStack.setCount(entity.inventory.getStackInSlot(2).getCount() + match.get().getResultItem().getCount());
             entity.inventory.setStackInSlot(2, outputStack);
 

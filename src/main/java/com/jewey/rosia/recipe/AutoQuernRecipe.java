@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class AutoQuernRecipe implements Recipe<SimpleContainer> {
     private final ResourceLocation id;
-    private final ItemStackProvider output;
+    private final ItemStack output;
     private final NonNullList<Ingredient> recipeItems;
 
     @Override
@@ -25,7 +25,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
         return true;
     }
 
-    public AutoQuernRecipe(ResourceLocation id, ItemStackProvider output, NonNullList<Ingredient> recipeItems) {
+    public AutoQuernRecipe(ResourceLocation id, ItemStack output, NonNullList<Ingredient> recipeItems) {
         this.id = id;
         this.output = output;
         this.recipeItems = recipeItems;
@@ -43,7 +43,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public ItemStack assemble(SimpleContainer pContainer) {
-        return output.stack().get();
+        return output;
     }
 
     @Override
@@ -53,11 +53,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public ItemStack getResultItem() {
-        return output.getEmptyStack();
-    }
-
-    public ItemStackProvider getResult(){
-        return output;
+        return output.copy();
     }
 
     @Override
@@ -88,7 +84,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public AutoQuernRecipe fromJson(ResourceLocation id, JsonObject json) {
-            ItemStackProvider output = ItemStackProvider.fromJson(GsonHelper.getAsJsonObject(json, "output"));
+            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 
             JsonArray ingredients = GsonHelper.getAsJsonArray(json, "ingredients");
             NonNullList<Ingredient> inputs = NonNullList.withSize(1, Ingredient.EMPTY);
@@ -106,7 +102,7 @@ public class AutoQuernRecipe implements Recipe<SimpleContainer> {
 
             inputs.replaceAll(ignored -> Ingredient.fromNetwork(buf));
 
-            ItemStackProvider output = ItemStackProvider.fromNetwork(buf);
+            ItemStack output = buf.readItem();
             return new AutoQuernRecipe(id, output, inputs);
         }
 

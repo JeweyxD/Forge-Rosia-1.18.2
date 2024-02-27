@@ -3,7 +3,6 @@ package com.jewey.rosia.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.jewey.rosia.Rosia;
-import net.dries007.tfc.util.JsonHelpers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +11,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,20 +18,27 @@ import org.jetbrains.annotations.Nullable;
 public class LavaBasinRecipe implements Recipe<SimpleContainer> {
     private final ResourceLocation id;
     private final ItemStack output;
+    private final NonNullList<Ingredient> recipeItems;
 
     @Override
     public boolean isSpecial() {
         return true;
     }
 
-    public LavaBasinRecipe(ResourceLocation id, ItemStack output) {
+    public LavaBasinRecipe(ResourceLocation id, ItemStack output, NonNullList<Ingredient> recipeItems) {
         this.id = id;
         this.output = output;
+        this.recipeItems = recipeItems;
     }
 
     @Override
     public boolean matches(SimpleContainer pContainer, Level pLevel) {
         return true;
+    }
+
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        return recipeItems;
     }
 
     @Override
@@ -79,16 +84,26 @@ public class LavaBasinRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public LavaBasinRecipe fromJson(ResourceLocation id, JsonObject json) {
-            final ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
 
-            return new LavaBasinRecipe(id, output);
+            JsonArray ingredients = GsonHelper.getAsJsonArray(json, "ingredients");
+            NonNullList<Ingredient> inputs = NonNullList.withSize(1, Ingredient.EMPTY);
+
+            for (int i = 0; i < inputs.size(); i++) {
+                inputs.set(i, Ingredient.fromJson(ingredients.get(i)));
+            }
+
+            return new LavaBasinRecipe(id, output, inputs);
         }
 
         @Override
         public LavaBasinRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
-            ItemStack output = buf.readItem();
+            NonNullList<Ingredient> inputs = NonNullList.withSize(buf.readInt(), Ingredient.EMPTY);
 
-            return new LavaBasinRecipe(id, output);
+            inputs.replaceAll(ignored -> Ingredient.fromNetwork(buf));
+
+            ItemStack output = buf.readItem();
+            return new LavaBasinRecipe(id, output, inputs);
         }
 
         @Override

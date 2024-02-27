@@ -32,6 +32,7 @@ public class JEIRosiaPlugin implements IModPlugin {
         registration.addRecipeCategories(new ElectricLoomRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new ScrapingMachineRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new BoilingCauldronRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new LavaBasinRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -55,6 +56,9 @@ public class JEIRosiaPlugin implements IModPlugin {
 
         List<BoilingCauldronRecipe> boilingCauldronRecipes = rm.getAllRecipesFor(BoilingCauldronRecipe.Type.INSTANCE);
         registration.addRecipes(new RecipeType<>(BoilingCauldronRecipeCategory.UID, BoilingCauldronRecipe.class), boilingCauldronRecipes);
+
+        List<LavaBasinRecipe> lavaBasinRecipes = rm.getAllRecipesFor(LavaBasinRecipe.Type.INSTANCE);
+        registration.addRecipes(new RecipeType<>(LavaBasinRecipeCategory.UID, LavaBasinRecipe.class), lavaBasinRecipes);
     }
 
     @Override
@@ -66,5 +70,6 @@ public class JEIRosiaPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.ELECTRIC_LOOM.get()), ElectricLoomRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.SCRAPING_MACHINE.get()), ScrapingMachineRecipeCategory.UID);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.BOILING_CAULDRON.get()), BoilingCauldronRecipeCategory.UID);
+        registration.addRecipeCatalyst(new ItemStack(ModBlocks.LAVA_BASIN.get()), LavaBasinRecipeCategory.UID);
     }
 }

@@ -177,7 +177,7 @@ public class LavaBasinBlockEntity extends TickableInventoryBlockEntity<ItemStack
 
     public static void makeStone(LavaBasinBlockEntity entity)
     {
-        //Create cobble after consuming fluid
+        //Create stone after consuming fluid
         Level level = entity.level;
         SimpleContainer inventory = new SimpleContainer(entity.inventory.getSlots());
         for (int i = 0; i < entity.inventory.getSlots(); i++)
